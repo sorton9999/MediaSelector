@@ -9,7 +9,7 @@ using MethodSelector;
 
 namespace MethodSelectorConsole
 {
-    public class Bank : ViewModelBase
+    public class Bank
     {
         private readonly Dictionary<string, Account> accounts = new Dictionary<string, Account>();
         private AccountDetailsListViewModel accountDetails = new AccountDetailsListViewModel();

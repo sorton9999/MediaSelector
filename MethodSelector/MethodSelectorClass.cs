@@ -17,7 +17,7 @@ namespace MethodSelector
     /// In this case, the data is an account balance and the functions or
     /// actions are the banking operations.
     /// Ted Neward's pattern blogs can be found at 
-    /// http://http://blogs.tedneward.com/patterns/catalog/
+    /// http://blogs.tedneward.com/patterns/catalog/
     /// </summary>
     public class MethodSelectorClass
     {
