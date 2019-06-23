@@ -9,51 +9,6 @@ namespace MethodSelectorConsole
 {
     public enum AccountType { UNINIT = -99, INTEREST_CHECKING = 0, SIMPLE_CHECKING, SAVINGS, OTHER }
 
-    public sealed class AccountDetailsViewModel : ViewModelBase
-    {
-        private string accountName = "nobody";
-        private AccountType accountType = AccountType.UNINIT;
-        private string accountId = "0";
-        private int accountBalance = 0;
-
-        public string AccountName
-        {
-            get { return accountName; }
-            set
-            {
-                accountName = value;
-                NotifyPropertyChanged();
-            }
-        }
-        public AccountType Type
-        {
-            get { return accountType; }
-            set
-            {
-                accountType = value;
-                NotifyPropertyChanged();
-            }
-        }
-        public string AccountId
-        {
-            get { return accountId; }
-            set
-            {
-                accountId = value;
-                NotifyPropertyChanged();
-            }
-        }
-        public int Balance
-        {
-            get { return accountBalance; }
-            set
-            {
-                accountBalance = value;
-                NotifyPropertyChanged();
-            }
-        }
-    }
-
     public class Account
     {
         private readonly MethodSelectorClass selector;
