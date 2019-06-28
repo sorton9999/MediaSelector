@@ -135,6 +135,10 @@ namespace MethodSelectorConsole
         {
             selector = new MethodSelectorExtensionClass(balance);
             AccountDetails.Type = AccountType.SIMPLE_CHECKING;
+            AccountDetails.AccountName = name;
+            AccountDetails.AccountId = id;
+            AccountDetails.Balance = balance;
+            AccountDetails.AddBtn = false;
         }
 
         public override float AccountAction(string action, float amt)
@@ -165,6 +169,7 @@ namespace MethodSelectorConsole
             AccountDetails.AccountName = name;
             AccountDetails.AccountId = id;
             AccountDetails.Balance = balance;
+            AccountDetails.AddBtn = true;
         }
 
         public override float AccountAction(string action, float amt)

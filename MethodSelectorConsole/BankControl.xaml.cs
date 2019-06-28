@@ -41,7 +41,7 @@ namespace MethodSelectorConsole
                 float amt = (float)Convert.ToDouble(entryTextBox.Text);
                 if (type == AccountType.SIMPLE_CHECKING)
                 {
-                    BankControlForm.Bank.PerformAction(name, "deposit", amt, true);
+                    BankControlForm.Bank.PerformAction(name, "deposit", amt, false, true);
                 }
                 else if (type == AccountType.INTEREST_CHECKING)
                 {
@@ -97,5 +97,22 @@ namespace MethodSelectorConsole
             AccountDetailsViewModel details = BankControlForm.Bank.AccountDetailsList.AccountDetailsList[idx];
             vm.ActiveAccountName = details.AccountName;
         }
+    }
+
+    public class BoolToVisibilityConverter : IValueConverter
+    {
+        #region IValueConverter Members
+
+        public object Convert(object value, System.Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            return (bool)value ? Visibility.Visible : Visibility.Collapsed;
+        }
+
+        public object ConvertBack(object value, System.Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            return false; // not needed
+        }
+
+        #endregion
     }
 }

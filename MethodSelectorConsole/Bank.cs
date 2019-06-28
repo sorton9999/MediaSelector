@@ -20,7 +20,7 @@ namespace MethodSelectorConsole
 
         }
 
-        public Dictionary<string, Account> Accounts
+        public Dictionary<string, AccountBase> Accounts
         {
             get;
             private set;

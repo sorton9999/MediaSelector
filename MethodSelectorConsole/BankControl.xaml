@@ -6,14 +6,39 @@
              xmlns:local="clr-namespace:MethodSelectorConsole"
              mc:Ignorable="d" 
              d:DesignHeight="570" d:DesignWidth="800">
+    <UserControl.Resources>
+        <local:BoolToVisibilityConverter x:Key="converter"/>
+    </UserControl.Resources>
     <Grid>
         <Label x:Name="label" Content="Active Account:" HorizontalAlignment="Left" Margin="20,307,0,0" VerticalAlignment="Top" Width="103" RenderTransformOrigin="0.527,-0.42"/>
-        <ListView x:Name="acctListView" HorizontalAlignment="Left" Height="250" Margin="20,38,0,0" VerticalAlignment="Top" Width="475" SelectionChanged="AcctListView_SelectionChanged"  SelectionMode="Single">
+        <ListView x:Name="acctListView" HorizontalAlignment="Left" Height="250" Margin="20,38,0,0" VerticalAlignment="Top" Width="475" SelectionChanged="AcctListView_SelectionChanged"  SelectionMode="Single" AlternationCount="2">
+            <ListView.Resources>
+                <Style TargetType="ListViewItem">
+                    <Style.Triggers>
+                        <Trigger Property="ItemsControl.AlternationIndex" Value="0">
+                            <Setter Property="Background" Value="LightBlue"/>
+                        </Trigger>
+                        <Trigger Property="ItemsControl.AlternationIndex" Value="1">
+                            <Setter Property="Background" Value="LightGray"/>
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+            </ListView.Resources>
             <ListView.View>
                 <GridView>
                     <GridViewColumn x:Name="NameCol" Header="Name" Width="145" DisplayMemberBinding="{Binding Path=AccountName}"/>
-                    <GridViewColumn x:Name="IdCol" Header="Acct ID" Width="100" DisplayMemberBinding="{Binding Path=AccountId}"/>
-                    <GridViewColumn x:Name="TypeCol" Header="Acct Type" Width="130" DisplayMemberBinding="{Binding Path=Type}"/>
+                    <GridViewColumn x:Name="IdCol" Header="Acct ID" Width="100" DisplayMemberBinding="{Binding Path=AccountId}">
+                    </GridViewColumn>
+                    <GridViewColumn x:Name="TypeCol" Header="Acct Type" Width="130">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <StackPanel x:Name="acctStackPanel" Orientation="Vertical" Margin="4,1,4,1">
+                                    <Label x:Name="acctTypeLabel" Content="{Binding Path=Type}" Width="110" Height="30"/>
+                                    <Button x:Name="accrueInterestButton" Content="Accrue" Visibility="{Binding Path=AddBtn, Converter={StaticResource converter}}" Width="110" Height="30" Margin="3,0,3,6"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
                     <GridViewColumn x:Name="BalanceCol" Header="Balance" Width="75" DisplayMemberBinding="{Binding Path=Balance}"/>
                 </GridView>
             </ListView.View>
