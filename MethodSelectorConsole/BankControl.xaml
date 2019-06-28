@@ -8,12 +8,12 @@
              d:DesignHeight="570" d:DesignWidth="800">
     <Grid>
         <Label x:Name="label" Content="Active Account:" HorizontalAlignment="Left" Margin="20,307,0,0" VerticalAlignment="Top" Width="103" RenderTransformOrigin="0.527,-0.42"/>
-        <ListView x:Name="acctListView" HorizontalAlignment="Left" Height="250" Margin="20,38,0,0" VerticalAlignment="Top" Width="444" SelectionChanged="AcctListView_SelectionChanged"  SelectionMode="Single">
+        <ListView x:Name="acctListView" HorizontalAlignment="Left" Height="250" Margin="20,38,0,0" VerticalAlignment="Top" Width="475" SelectionChanged="AcctListView_SelectionChanged"  SelectionMode="Single">
             <ListView.View>
                 <GridView>
                     <GridViewColumn x:Name="NameCol" Header="Name" Width="145" DisplayMemberBinding="{Binding Path=AccountName}"/>
                     <GridViewColumn x:Name="IdCol" Header="Acct ID" Width="100" DisplayMemberBinding="{Binding Path=AccountId}"/>
-                    <GridViewColumn x:Name="TypeCol" Header="Acct Type" Width="100" DisplayMemberBinding="{Binding Path=Type}"/>
+                    <GridViewColumn x:Name="TypeCol" Header="Acct Type" Width="130" DisplayMemberBinding="{Binding Path=Type}"/>
                     <GridViewColumn x:Name="BalanceCol" Header="Balance" Width="75" DisplayMemberBinding="{Binding Path=Balance}"/>
                 </GridView>
             </ListView.View>
@@ -25,8 +25,9 @@
                         <Button x:Name="openButton" Content="Open Acct" Width="100" Margin="10" Click="OpenButton_Click"/>
                         <Button x:Name="depositButton" Content="Deposit" Width="100" Margin="10" Click="DepositButton_Click"/>
                         <Button x:Name="withdrawButton" Content="Withdraw" Width="100" Margin="10" Click="WithdrawButton_Click"/>
+                        <ComboBox x:Name="acctTypeComboBox" Width="150" Height="30" Padding="3,8,0,0"/>
                         <Label x:Name="label1" Content="Enter an Amount: $" Margin="0,30,0,20" Padding="5,6,5,5"/>
-                        <TextBox x:Name="entryTextBox" Text="0" Width="285" Margin="0,30,10,20" Padding="0,6,1,0"/>
+                        <TextBox x:Name="entryTextBox" Text="0" Width="130" Margin="0,30,10,20" Padding="0,6,1,0"/>
                     </StackPanel>
                     <TextBox x:Name="errorTextBox" Text="{Binding Path=ErrorString, UpdateSourceTrigger=PropertyChanged}" Height="30" Margin="10,20,10,0" Foreground="#FFEA1156" Padding="0,6,0,0" FontWeight="Bold" IsReadOnly="True"/>
                 </StackPanel>

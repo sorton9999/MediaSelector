@@ -6,36 +6,86 @@ using System.Threading.Tasks;
 
 namespace MethodSelector
 {
+
+     public class MethodSelectorExtensionClass : MethodSelectorClass
+    {
+        public MethodSelectorExtensionClass(float balance)
+            : base (balance)
+        {
+        }
+
+        public void ExtendSelection(string action, float inter, float amt = 0)
+        {
+            Func<Func<string, Func<float, float>>> makeAccount =
+                ((Func<Func<string, Func<float, float>>>)(() =>
+                {
+                    MethodSelector("balance", amt);
+                    float balance = Balance;
+                    return (string transaction) =>
+                    {
+                        switch (transaction)
+                        {
+                            case "accrue":
+                                return (float interest) =>
+                                {
+                                    balance += (balance * interest);
+                                    return balance;
+                                };
+                            case "balance":
+                            case "deposit":
+                            case "withdraw":
+                                return (float amount) =>
+                                {
+                                    var acc = Account(transaction);
+                                    return (acc(amount));
+                                };
+                            default:
+                                throw new IllegalOperationException(@"Illegal Operation: " + transaction);
+                        }
+                    };
+                }
+                ));
+            var a = makeAccount();
+            Balance = a(action)(inter);
+        }
+    }
+
     /// <summary>
     /// Provides 3 different anonymous method selector methods that takes
     /// a banking action (Balance, Deposit, Withdraw) and performs that
     /// action on the balance.  The balance is available after the action
     /// is performed.  Each of the methods follow a flavor of the
-    /// Envoy pattern as discussed at length in Ted Neward's blog.  This
-    /// is a functional programming technique that employs a closure that
-    /// encapsulates the data and provides functions that act on the data.
-    /// In this case, the data is an account balance and the functions or
-    /// actions are the banking operations.
+    /// Envoy pattern language as discussed at length in Ted Neward's blog.
+    /// This is a functional programming technique that employs a closure
+    /// that encapsulates the data and provides functions that act on the
+    /// data.  In this case, the data is an account balance and the functions
+    /// or actions are the banking operations.
     /// Ted Neward's pattern blogs can be found at 
     /// http://blogs.tedneward.com/patterns/catalog/
     /// </summary>
     public class MethodSelectorClass
     {
-        public MethodSelectorClass(int balance)
+        public MethodSelectorClass(float balance)
         {
             Balance = balance;
         }
 
-        public int Balance
+        public float Balance
+        {
+            get;
+            protected set;
+        }
+
+        public Func<string, Func<float, float>> Account
         {
             get;
             private set;
         }
 
-        public void MethodSelector(string action, int tAmt)
+        public void MethodSelector(string action, float tAmt)
         {
-            Func<int, Func<string, Func<int, int>>> makeAccount =
-                ((Func<int, Func<string, Func<int, int>>>)((bal) =>
+            Func<float, Func<string, Func<float, float>>> makeAccount =
+                ((Func<float, Func<string, Func<float, float>>>)((bal) =>
                 {
                     var balance = bal;
                     return (string transaction) =>
@@ -43,7 +93,7 @@ namespace MethodSelector
                         switch (transaction)
                         {
                             case "withdraw":
-                                return (int amount) =>
+                                return (float amount) =>
                                 {
                                     if (balance >= amount)
                                     {
@@ -56,13 +106,13 @@ namespace MethodSelector
                                     }
                                 };
                             case "deposit":
-                                return (int amount) =>
+                                return (float amount) =>
                                 {
                                     balance += amount;
                                     return balance;
                                 };
                             case "balance":
-                                return (int unused) =>
+                                return (float unused) =>
                                 {
                                     return balance;
                                 };
@@ -73,16 +123,17 @@ namespace MethodSelector
                 }
                 ));
             var acct = makeAccount(Balance);
+            Account = acct;
             Balance = acct(action)(tAmt);
         }
 
-        public void MethodSelector2(string action, int tAmt)
+        public void MethodSelector2(string action, float tAmt)
         {
-            Func<int, dynamic> makeAccount = (int bal) =>
+            Func<float, dynamic> makeAccount = (float bal) =>
             {
                 var balance = bal;
                 dynamic result = new System.Dynamic.ExpandoObject();
-                result.withdraw = (Func<int, int>)((amount) =>
+                result.withdraw = (Func<float, float>)((amount) =>
                 {
                     if (balance >= amount)
                     {
@@ -94,12 +145,12 @@ namespace MethodSelector
                         throw new InsufficientFundsException(@"Insufficient funds. Balance: " + Balance);
                     }
                 });
-                result.deposit = (Func<int, int>)((amount) =>
+                result.deposit = (Func<float, float>)((amount) =>
                 {
                     balance += amount;
                     return balance;
                 });
-                result.balance = (Func<int>)(() => balance);
+                result.balance = (Func<float>)(() => balance);
                 return result;
             };
             var acct = makeAccount(Balance);
@@ -119,14 +170,14 @@ namespace MethodSelector
             }
         }
 
-        public void MethodSelector3(string action, int tAmt)
+        public void MethodSelector3(string action, float tAmt)
         {
-            Func<int, Dictionary<string, Func<int, int>>> makeAccount =
-                (int bal) =>
+            Func<float, Dictionary<string, Func<float, float>>> makeAccount =
+                (float bal) =>
                 {
                     var balance = bal;
-                    var result = new Dictionary<string, Func<int, int>>();
-                    result["withdraw"] = (Func<int, int>)((amount) =>
+                    var result = new Dictionary<string, Func<float, float>>();
+                    result["withdraw"] = (Func<float, float>)((amount) =>
                     {
                         if (balance >= amount)
                         {
@@ -138,12 +189,12 @@ namespace MethodSelector
                             throw new InsufficientFundsException(@"Insufficient Funds! Balance: " + Balance);
                         }
                     });
-                    result["deposit"] = (Func<int, int>)((amount) =>
+                    result["deposit"] = (Func<float, float>)((amount) =>
                     {
                         balance += amount;
                         return balance;
                     });
-                    result["balance"] = (Func<int, int>)((unused) => balance);
+                    result["balance"] = (Func<float, float>)((unused) => balance);
                     return result;
                 };
             var acct = makeAccount(Balance);
