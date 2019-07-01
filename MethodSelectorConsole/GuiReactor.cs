@@ -27,7 +27,7 @@ namespace MethodSelectorConsole
 
         protected GuiReactor(T display, string[] args, Bank bank)
         {
-            _display = null;
+            _display = default(T);
             _bank = bank;
             _display = display;
         }

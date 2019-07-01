@@ -11,7 +11,8 @@ namespace MethodSelectorConsole
         private string accountName = "nobody";
         private AccountType accountType = AccountType.UNINIT;
         private string accountId = "0";
-        private int accountBalance = 0;
+        private float accountBalance = 0F;
+        private bool addBtn = false;
 
         public string AccountName
         {
@@ -40,12 +41,22 @@ namespace MethodSelectorConsole
                 NotifyPropertyChanged();
             }
         }
-        public int Balance
+        public float Balance
         {
             get { return accountBalance; }
             set
             {
                 accountBalance = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        public bool AddBtn
+        {
+            get { return addBtn; }
+            set
+            {
+                addBtn = value;
                 NotifyPropertyChanged();
             }
         }

@@ -11,7 +11,7 @@ namespace MethodSelectorConsole
 {
     public class Bank
     {
-        private readonly Dictionary<string, Account> accounts = new Dictionary<string, Account>();
+        private readonly Dictionary<string, AccountBase> accounts = new Dictionary<string, AccountBase>();
         private AccountDetailsListViewModel accountDetails = new AccountDetailsListViewModel();
         private string newId = "12345";
 
@@ -20,7 +20,7 @@ namespace MethodSelectorConsole
 
         }
 
-        public Dictionary<string, Account> Accounts
+        public Dictionary<string, AccountBase> Accounts
         {
             get;
             private set;
@@ -35,10 +35,10 @@ namespace MethodSelectorConsole
             }
         }
 
-        public int PerformAction(string name, string action, int amount, bool openAcct = false)
+        public float PerformAction(string name, string action, float amount, bool extended, bool openAcct = false)
         {
-            Account account = null;
-            int balance = 0;
+            AccountBase account = null;
+            float balance = 0;
             try
             {
                 account = FindAccount(name);
@@ -50,7 +50,7 @@ namespace MethodSelectorConsole
                 {
                     long id = Convert.ToInt64(newId);
                     newId = (++id).ToString();
-                    account = MakeAccount(name, newId, amount);
+                    account = MakeAccount(name, newId, amount, extended);
                 }
                 else
                 {
@@ -81,7 +81,7 @@ namespace MethodSelectorConsole
             return balance;
         }
 
-        private int AccountActions(Account account, string action, int amount)
+        private float AccountActions(AccountBase account, string action, float amount)
         {
             try
             {
@@ -103,7 +103,7 @@ namespace MethodSelectorConsole
             }
         }
 
-        private void UpdateDetails(Account account, int balance)
+        private void UpdateDetails(AccountBase account, float balance)
         {
             var item = accountDetails.AccountDetailsList.ToLookup(x => x.AccountName == account.AccountName);
             foreach (var p in item[true])
@@ -113,10 +113,18 @@ namespace MethodSelectorConsole
             
         }
 
-        private Account MakeAccount(string name, string id, int deposit)
+        private AccountBase MakeAccount(string name, string id, float deposit, bool extended)
         {
             Console.WriteLine("<<< Making an account for: [{0}] with initial deposit: [{1}] >>>", name, deposit);
-            Account account = new Account(name, id, deposit);
+            AccountBase account = null;
+            if (extended)
+            {
+                account = new InterestAccount(name, id, deposit);
+            }
+            else
+            {
+                account = new SimpleAccount(name, id, deposit);
+            }
             try
             {
                 accounts.Add(name, account);
@@ -130,9 +138,14 @@ namespace MethodSelectorConsole
             return account;
         }
 
-        private Account FindAccount(string name)
+        internal float PerformExtendedAction(string name, string action, float amt, bool openAcct)
         {
-            Account account = null;
+            return (PerformAction(name, action, amt, true, openAcct));
+        }
+
+        private AccountBase FindAccount(string name)
+        {
+            AccountBase account = null;
             try
             {
                 var acct = accounts.ToLookup(x => x.Key == name);

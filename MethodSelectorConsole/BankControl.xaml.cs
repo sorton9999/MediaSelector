@@ -27,6 +27,7 @@ namespace MethodSelectorConsole
             InitializeComponent();
             acctTextBox.DataContext = vm;
             errorTextBox.DataContext = vm;
+            acctTypeComboBox.ItemsSource = Account.LoadAccountTypes();
         }
 
         private void OpenButton_Click(object sender, RoutedEventArgs e)
@@ -35,8 +36,21 @@ namespace MethodSelectorConsole
             try
             {
                 string name = acctTextBox.Text;
-                int amt = Convert.ToInt32(entryTextBox.Text);
-                BankControlForm.Bank.PerformAction(name, "deposit", amt, true);
+                int idx = acctTypeComboBox.SelectedIndex;
+                AccountType type = (AccountType)Enum.Parse(typeof(AccountType), idx.ToString());
+                float amt = (float)Convert.ToDouble(entryTextBox.Text);
+                if (type == AccountType.SIMPLE_CHECKING)
+                {
+                    BankControlForm.Bank.PerformAction(name, "deposit", amt, false, true);
+                }
+                else if (type == AccountType.INTEREST_CHECKING)
+                {
+                    BankControlForm.Bank.PerformExtendedAction(name, "accrue", amt, true);
+                }
+                else
+                {
+                    vm.ErrorString = "Unsupported Checking Type. Choose Simple or Interest Account Type.";
+                }
             }
             catch (Exception ex)
             {
@@ -51,7 +65,7 @@ namespace MethodSelectorConsole
             try
             {
                 string name = acctTextBox.Text;
-                int amt = Convert.ToInt32(entryTextBox.Text);
+                float amt = (float)Convert.ToDouble(entryTextBox.Text);
                 BankControlForm.Bank.PerformAction(name, "deposit", amt, false);
             }
             catch (Exception ex)
@@ -67,7 +81,7 @@ namespace MethodSelectorConsole
             try
             {
                 string name = acctTextBox.Text;
-                int amt = Convert.ToInt32(entryTextBox.Text);
+                float amt = (float)Convert.ToDouble(entryTextBox.Text);
                 BankControlForm.Bank.PerformAction(name, "withdraw", amt, false);
             }
             catch (Exception ex)
@@ -83,5 +97,22 @@ namespace MethodSelectorConsole
             AccountDetailsViewModel details = BankControlForm.Bank.AccountDetailsList.AccountDetailsList[idx];
             vm.ActiveAccountName = details.AccountName;
         }
+    }
+
+    public class BoolToVisibilityConverter : IValueConverter
+    {
+        #region IValueConverter Members
+
+        public object Convert(object value, System.Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            return (bool)value ? Visibility.Visible : Visibility.Collapsed;
+        }
+
+        public object ConvertBack(object value, System.Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            return false; // not needed
+        }
+
+        #endregion
     }
 }
