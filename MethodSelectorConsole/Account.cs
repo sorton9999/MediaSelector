@@ -14,11 +14,6 @@ namespace MethodSelectorConsole
         protected string accountName = String.Empty;
         protected AccountDetailsViewModel details = new AccountDetailsViewModel();
 
-        //public string AccountName
-        //{
-        //    get { return details.AccountName; }
-        //    protected set { details.AccountName = value; }
-        //}
         public string AccountName
         {
             get { return accountName; }
@@ -141,20 +136,11 @@ namespace MethodSelectorConsole
             AccountDetails.AddBtn = false;
         }
 
-        public override float AccountAction(string action, float amt)
-        {
-            return base.AccountAction(action, amt);
-        }
+        //public override float AccountAction(string action, float amt)
+        //{
+        //    return base.AccountAction(action, amt);
+        //}
 
-        public override float AccountBalance()
-        {
-            return base.AccountBalance();
-        }
-
-        public override void PrintAccountDetails(int idx)
-        {
-            base.PrintAccountDetails(idx);
-        }
     }
 
     public class InterestAccount : Account
@@ -191,14 +177,44 @@ namespace MethodSelectorConsole
             }
         }
 
-        public override float AccountBalance()
+        public float AccountAccrue(float interest)
         {
-            return base.AccountBalance();
+            return (AccountAction("accrue", interest));
+        }
+    }
+
+    public class SavingsAccount : Account
+    {
+        private readonly MethodSelectorExtensionClass selector = null;
+
+        public SavingsAccount(string name, string id, float balance)
+            : base(name, id, balance)
+        {
+            selector = new MethodSelectorExtensionClass(balance);
+            AccountDetails.Type = AccountType.SAVINGS;
+            AccountDetails.AccountName = name;
+            AccountDetails.AccountId = id;
+            AccountDetails.Balance = balance;
+            AccountDetails.AddBtn = true;
         }
 
-        public override void PrintAccountDetails(int idx)
+        public override float AccountAction(string action, float amt)
         {
-            base.PrintAccountDetails(idx);
+            try
+            {
+                Func<string, float, float> perform =
+                    ((Func<string, float, float>)((transaction, amount) =>
+                    {
+                        selector.ExtendSelection(transaction, amount);
+                        return selector.Balance;
+                    }
+                ));
+                return (perform(action, amt));
+            }
+            catch (Exception e)
+            {
+                throw new IllegalOperationException(("Exception: " + e.Message + " for Action: " + action + " on Account: " + AccountName), e.InnerException);
+            }
         }
 
         public float AccountAccrue(float interest)
