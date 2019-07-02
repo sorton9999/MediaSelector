@@ -26,7 +26,6 @@ namespace MethodSelectorConsole
             string name = String.Empty;
             float amt = 0F;
             float balance = 0F;
-            AccountType acctType = AccountType.UNINIT;
             Console.Write("Enter a name: ");
             entry = Console.ReadLine();
             name = entry;
@@ -51,12 +50,11 @@ namespace MethodSelectorConsole
                     {
                         case "open":
                         case "o":
-                            Console.WriteLine("Opening an Account. What Type? [s]imple, [i]nterest or [sa]vings");
+                            Console.WriteLine("Opening an Account. What Type? [s]imple or [i]nterest");
                             string type = Console.ReadLine();
                             Console.Write("Initial Deposit? ");
                             entry = Console.ReadLine();
                             amt = (float)Convert.ToDouble(entry);
-                            string cmd = "uninit";
                             if (type == "s")
                             {
                                 acctType = AccountType.SIMPLE_CHECKING;
@@ -71,18 +69,10 @@ namespace MethodSelectorConsole
                             {
                                 acctType = AccountType.SAVINGS;
                                 cmd = "accrue";
-                            }
-                            else
+=======
+                            if (type == "s")
                             {
-                                Console.WriteLine("Undefined action: " + type + ". Type one of [s] or [i].");
-                            }
-                            try
-                            {
-                                balance = bank.PerformAction(name, cmd, amt, acctType, true);
-                            }
-                            catch (Exception e)
-                            {
-                                Console.WriteLine(e.Message);
+                                balance = bank.PerformAction(name, "deposit", amt, true);
                             }
                             break;
                         case "deposit":
@@ -90,14 +80,7 @@ namespace MethodSelectorConsole
                             Console.Write("How much do you want to deposit? ");
                             entry = Console.ReadLine();
                             amt = (float)Convert.ToDouble(entry);
-                            try
-                            {
-                                balance = bank.PerformAction(name, "deposit", amt);
-                            }
-                            catch (Exception e)
-                            {
-                                Console.WriteLine(e.Message);
-                            }
+                            balance = bank.PerformAction(name, "deposit", amt, false);
                             break;
                         case "withdraw":
                         case "w":
@@ -106,7 +89,7 @@ namespace MethodSelectorConsole
                             amt = (float)Convert.ToDouble(entry);
                             try
                             {
-                                balance = bank.PerformAction(name, "withdraw", amt);
+                                balance = bank.PerformAction(name, "withdraw", amt, false);
                             }
                             catch (Exception e)
                             {
@@ -115,14 +98,7 @@ namespace MethodSelectorConsole
                             break;
                         case "balance":
                         case "b":
-                            try
-                            {
-                                Console.WriteLine("Balance is: " + bank.PerformAction(name, "balance", amt));
-                            }
-                            catch (Exception e)
-                            {
-                                Console.WriteLine(e.Message);
-                            }
+                            Console.WriteLine("Balance is: " + bank.PerformAction(name, "balance", amt, false));
                             break;
                         case "accrue":
                         case "a":
@@ -136,32 +112,18 @@ namespace MethodSelectorConsole
                                 interest = (float)Convert.ToDouble(entry);
                                 Console.WriteLine("Interest changed to: [{0}]", interest);
                             }
-                            try
-                            {
-                                balance = bank.PerformAction(name, "accrue", interest);
-                            }
-                            catch (Exception e)
-                            {
-                                Console.WriteLine(e.Message);
-                            }
+                            balance = bank.PerformAction(name, "accrue", interest, true);
                             break;
                         case "switch":
                         case "s":
                             Console.Write("Enter the Account Name to Switch to: ");
                             name = Console.ReadLine();
                             amt = 0;
-                            try
-                            {
-                                balance = bank.PerformAction(name, "balance", 0);
-                            }
-                            catch (Exception e)
-                            {
-                                Console.WriteLine(e.Message);
-                            }
+                            balance = bank.PerformAction(name, "balance", 0, false);
                             break;
                         case "print":
                         case "p":
-                            Console.WriteLine(bank.PerformAction(name, "print", amt));
+                            Console.WriteLine(bank.PerformAction(name, "print", amt, false));
                             break;
                         case "dump":
                         case "du":

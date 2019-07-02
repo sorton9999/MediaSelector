@@ -14,128 +14,7 @@ namespace MethodSelectorConsole
         protected string accountName = String.Empty;
         protected AccountDetailsViewModel details = new AccountDetailsViewModel();
 
-        public string AccountName
-        {
-            get { return accountName; }
-            private set { accountName = value; }
-        }
-
-
-        public AccountDetailsViewModel AccountDetails
-        {
-            get { return details; }
-            protected set { details = value; }
-        }
-
-        public abstract float AccountAction(string action, float amount);
-
-        public abstract void PrintAccountDetails(int idx);
-
-        public abstract float AccountBalance();
-    }
-
-    public class Account : AccountBase
-    {
-        private readonly MethodSelectorClass selector;
-        
-        public Account(string name, string id, float balance)
-        {
-            selector = new MethodSelectorClass(balance);
-            accountName = name;
-            // Default this for now
-            details.Type = AccountType.OTHER;
-            details.AccountId = id;
-        }
-
-        public static string[] LoadAccountTypes()
-        {
-            string[] items = Enum.GetNames(typeof(AccountType));
-            return items;
-        }
-
-        public float AccountDeposit(float amt)
-        {
-            try
-            {
-                AccountDetails.Balance = AccountAction("deposit", amt);
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-            return AccountDetails.Balance;
-        }
-
-        public float AccountWithdraw(float amt)
-        {
-            try
-            {
-                AccountDetails.Balance = AccountAction("withdraw", amt);
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-            return AccountDetails.Balance;
-        }
-
-        public override float AccountBalance()
-        {
-            float balance = AccountDetails.Balance;
-            try
-            {
-                balance = AccountAction("balance", 0);
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-            return balance;
-        }
-
-        public override float AccountAction(string action, float amt)
-        {
-            try
-            {
-                Func<string, float, float> perform = (transaction, amount) =>
-                {
-                    selector.MethodSelector(transaction, amount);
-                    return selector.Balance;
-                };
-                return (perform(action, amt));
-            }
-            catch (Exception e)
-            {
-                throw new IllegalOperationException(("Exception: " + e.Message + " for Action: " + action + " on Account: " + AccountName), e.InnerException);
-            }
-        }
-
-        public override void PrintAccountDetails(int idx)
-        {
-            AccountDetailsViewModel ad = AccountDetails;
-            Console.WriteLine("=== [{0}] Account Details ===", (idx + 1));
-            Console.WriteLine("Account Name: " + AccountName);
-            Console.WriteLine("Acct Type: " + ad.Type.ToString());
-            Console.WriteLine("Acct ID:   " + ad.AccountId);
-            Console.WriteLine("Balance: " + AccountBalance());
-        }
-    }
-
-    public class SimpleAccount : Account
-    {
-        private readonly MethodSelectorExtensionClass selector = null;
-
-        public SimpleAccount(string name, string id, float balance)
-            : base(name, id, balance)
-        {
-            selector = new MethodSelectorExtensionClass(balance);
-            AccountDetails.Type = AccountType.SIMPLE_CHECKING;
-            AccountDetails.AccountName = name;
-            AccountDetails.AccountId = id;
-            AccountDetails.Balance = balance;
-            AccountDetails.AddBtn = false;
-        }
-
+	[
         //public override float AccountAction(string action, float amt)
         //{
         //    return base.AccountAction(action, amt);
@@ -177,25 +56,9 @@ namespace MethodSelectorConsole
             }
         }
 
-        public float AccountAccrue(float interest)
+        public override float AccountBalance()
         {
-            return (AccountAction("accrue", interest));
-        }
-    }
-
-    public class SavingsAccount : Account
-    {
-        private readonly MethodSelectorExtensionClass selector = null;
-
-        public SavingsAccount(string name, string id, float balance)
-            : base(name, id, balance)
-        {
-            selector = new MethodSelectorExtensionClass(balance);
-            AccountDetails.Type = AccountType.SAVINGS;
-            AccountDetails.AccountName = name;
-            AccountDetails.AccountId = id;
-            AccountDetails.Balance = balance;
-            AccountDetails.AddBtn = true;
+            return base.AccountBalance();
         }
 
         public override float AccountAction(string action, float amt)
@@ -215,6 +78,16 @@ namespace MethodSelectorConsole
             {
                 throw new IllegalOperationException(("Exception: " + e.Message + " for Action: " + action + " on Account: " + AccountName), e.InnerException);
             }
+=======
+        public override float AccountBalance()
+        {
+            return base.AccountBalance();
+        }
+
+        public override void PrintAccountDetails(int idx)
+        {
+            base.PrintAccountDetails(idx);
+>>>>>>> f3a8c896113e2022969799da6d8db66a67a27b41
         }
 
         public float AccountAccrue(float interest)

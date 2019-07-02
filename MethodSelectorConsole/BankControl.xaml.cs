@@ -21,19 +21,18 @@ namespace MethodSelectorConsole
     /// </summary>
     public partial class BankControl : UserControl
     {
-        private AccountNameViewModel vm = new AccountNameViewModel();
-
+        public AccountNameViewModel vm = new AccountNameViewModel();
         public BankControl()
         {
             InitializeComponent();
-            acctTextBox.DataContext = Vm;
-            errorTextBox.DataContext = Vm;
+            acctTextBox.DataContext = vm;
+            errorTextBox.DataContext = vm;
             acctTypeComboBox.ItemsSource = Account.LoadAccountTypes();
         }
 
         private void OpenButton_Click(object sender, RoutedEventArgs e)
         {
-            Vm.ErrorString = String.Empty;
+            vm.ErrorString = String.Empty;
             try
             {
                 string name = acctTextBox.Text;
@@ -42,70 +41,63 @@ namespace MethodSelectorConsole
                 float amt = (float)Convert.ToDouble(entryTextBox.Text);
                 if (type == AccountType.SIMPLE_CHECKING)
                 {
-                    BankControlForm.Bank.PerformAction(name, "deposit", amt, type, true);
+                    BankControlForm.Bank.PerformAction(name, "deposit", amt, false, true);
                 }
                 else if (type == AccountType.INTEREST_CHECKING)
                 {
-                    BankControlForm.Bank.PerformAction(name, "accrue", amt, type, true);
-                }
-                else if (type == AccountType.SAVINGS)
-                {
-                    BankControlForm.Bank.PerformAction(name, "accrue", amt, type, true);
+                    BankControlForm.Bank.PerformExtendedAction(name, "accrue", amt, true);
                 }
                 else
                 {
                     Vm.ErrorString = "Unsupported Checking Type. Choose Simple, Interest or Savings Account Type.";
+=======
+                    BankControlForm.Bank.PerformAction(name, "deposit", amt, false, true);
+                }
+                else if (type == AccountType.INTEREST_CHECKING)
+                {
+                    BankControlForm.Bank.PerformExtendedAction(name, "accrue", amt, true);
+                }
+                else
+                {
+                    vm.ErrorString = "Unsupported Checking Type. Choose Simple or Interest Account Type.";
                 }
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
-                Vm.ErrorString = ex.Message;
-            }
-        }
-
-        public AccountNameViewModel Vm
-        {
-            get
-            {
-                return vm;
-            }
-
-            private set
-            {
-                vm = value;
+                vm.ErrorString = ex.Message;
             }
         }
 
         private void DepositButton_Click(object sender, RoutedEventArgs e)
         {
-            Vm.ErrorString = String.Empty;
+            vm.ErrorString = String.Empty;
             try
             {
                 string name = acctTextBox.Text;
                 float amt = (float)Convert.ToDouble(entryTextBox.Text);
-                BankControlForm.Bank.PerformAction(name, "deposit", amt);
+                BankControlForm.Bank.PerformAction(name, "deposit", amt, false);
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
-                Vm.ErrorString = ex.Message;
+                vm.ErrorString = ex.Message;
             }
         }
 
         private void WithdrawButton_Click(object sender, RoutedEventArgs e)
         {
-            Vm.ErrorString = String.Empty;
+            vm.ErrorString = String.Empty;
             try
             {
                 string name = acctTextBox.Text;
                 float amt = (float)Convert.ToDouble(entryTextBox.Text);
-                BankControlForm.Bank.PerformAction(name, "withdraw", amt);
+                BankControlForm.Bank.PerformAction(name, "withdraw", amt, false);
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
-                Vm.ErrorString = ex.Message;
+                vm.ErrorString = ex.Message;
             }
         }
 
@@ -113,7 +105,7 @@ namespace MethodSelectorConsole
         {
             int idx = (sender as ListView).SelectedIndex;
             AccountDetailsViewModel details = BankControlForm.Bank.AccountDetailsList.AccountDetailsList[idx];
-            Vm.ActiveAccountName = details.AccountName;
+            vm.ActiveAccountName = details.AccountName;
         }
     }
 

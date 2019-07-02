@@ -17,7 +17,7 @@ namespace MethodSelectorConsole
         {
             InitializeComponent();
             _bank = bank;
-            bankControl1.Vm.ActiveAccountName = name;
+            bankControl1.vm.ActiveAccountName = name;
             bankControl1.acctListView.ItemsSource = _bank.AccountDetailsList.AccountDetailsList;
         }
 

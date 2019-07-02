@@ -35,7 +35,7 @@ namespace MethodSelectorConsole
             }
         }
 
-        public float PerformAction(string name, string action, float amount, AccountType acctType = AccountType.SIMPLE_CHECKING, bool openAcct = false)
+        public float PerformAction(string name, string action, float amount, bool extended, bool openAcct = false)
         {
             AccountBase account = null;
             float balance = 0;
@@ -50,7 +50,7 @@ namespace MethodSelectorConsole
                 {
                     long id = Convert.ToInt64(newId);
                     newId = (++id).ToString();
-                    account = MakeAccount(name, newId, amount, acctType);
+                    account = MakeAccount(name, newId, amount, extended);
                 }
                 else
                 {
@@ -99,6 +99,7 @@ namespace MethodSelectorConsole
             {
                 Console.WriteLine(e.Message);
                 throw;
+                //return account.AccountBalance();
             }
         }
 
@@ -112,6 +113,7 @@ namespace MethodSelectorConsole
             
         }
 
+<<<<<<< HEAD
         private AccountBase MakeAccount(string name, string id, float deposit, AccountType acctType)
         {
             Console.WriteLine("<<< Making an account for: [{0}] with initial deposit: [{1}] >>>", name, deposit);
@@ -144,24 +146,32 @@ namespace MethodSelectorConsole
             //}
             if (account != null)
             {
-                try
-                {
-                    accounts.Add(name, account);
-                    accountDetails.AccountDetailsList.Add(account.AccountDetails);
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e.Message);
-                    account = null;
-                }
+                account = new SimpleAccount(name, id, deposit);
+            }
+            try
+            {
+                accounts.Add(name, account);
+                accountDetails.AccountDetailsList.Add(account.AccountDetails);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                account = null;
             }
             return account;
         }
 
+<<<<<<< HEAD
         //internal float PerformExtendedAction(string name, string action, float amt, bool openAcct)
         //{
         //    return (PerformAction(name, action, amt, true, openAcct));
         //}
+=======
+        internal float PerformExtendedAction(string name, string action, float amt, bool openAcct)
+        {
+            return (PerformAction(name, action, amt, true, openAcct));
+        }
+>>>>>>> f3a8c896113e2022969799da6d8db66a67a27b41
 
         private AccountBase FindAccount(string name)
         {
