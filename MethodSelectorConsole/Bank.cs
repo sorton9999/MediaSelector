@@ -113,15 +113,37 @@ namespace MethodSelectorConsole
             
         }
 
-        private AccountBase MakeAccount(string name, string id, float deposit, bool extended)
+        private AccountBase MakeAccount(string name, string id, float deposit, AccountType acctType)
         {
             Console.WriteLine("<<< Making an account for: [{0}] with initial deposit: [{1}] >>>", name, deposit);
             AccountBase account = null;
-            if (extended)
+            switch (acctType)
             {
-                account = new InterestAccount(name, id, deposit);
+                case AccountType.SIMPLE_CHECKING:
+                    account = new SimpleAccount(name, id, deposit);
+                    break;
+                case AccountType.INTEREST_CHECKING:
+                    account = new InterestAccount(name, id, deposit);
+                    break;
+                case AccountType.SAVINGS:
+                    account = new SavingsAccount(name, id, deposit);
+                    break;
+                case AccountType.OTHER:
+                    throw new BankingException("Account of type OTHER not supported.");
+                default:
+                    throw new IllegalOperationException("Unsupported account type detected.  Nothing done.");
+                    break;
             }
-            else
+
+            //if (extended)
+            //{
+            //    account = new InterestAccount(name, id, deposit);
+            //}
+            //else
+            //{
+            //    account = new SimpleAccount(name, id, deposit);
+            //}
+            if (account != null)
             {
                 account = new SimpleAccount(name, id, deposit);
             }

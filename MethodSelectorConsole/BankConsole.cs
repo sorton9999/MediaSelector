@@ -26,6 +26,8 @@ namespace MethodSelectorConsole
             string name = String.Empty;
             float amt = 0F;
             float balance = 0F;
+            AccountType acctType = AccountType.UNINIT;
+            string cmd = String.Empty;
             Console.Write("Enter a name: ");
             entry = Console.ReadLine();
             name = entry;
@@ -57,13 +59,20 @@ namespace MethodSelectorConsole
                             amt = (float)Convert.ToDouble(entry);
                             if (type == "s")
                             {
-                                balance = bank.PerformAction(name, "deposit", amt, true);
+                                acctType = AccountType.SIMPLE_CHECKING;
+                                cmd = "deposit";
                             }
                             else if (type == "i")
                             {
-                                balance = bank.PerformExtendedAction(name, "accrue", amt, true);
+                                acctType = AccountType.INTEREST_CHECKING;
+                                cmd = "accrue";
                             }
-                            else
+                            else if (type == "sa")
+                            {
+                                acctType = AccountType.SAVINGS;
+                                cmd = "accrue";
+                            }
+                            if (type == "s")
                             {
                                 Console.WriteLine("Undefined action: " + type + ". Type one of [s] or [i].");
                             }

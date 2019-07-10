@@ -9,10 +9,13 @@
 *.user
 *.userosscache
 *.sln.docstates
+<<<<<<< HEAD
 *.sav
 *.new
 *.old
 *.bak
+=======
+>>>>>>> b0992a1... Add .gitignore and .gitattributes.
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
