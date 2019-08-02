@@ -14,11 +14,19 @@ namespace MethodSelectorConsole
         private readonly Dictionary<string, AccountBase> accounts = new Dictionary<string, AccountBase>();
         private AccountDetailsListViewModel accountDetails = new AccountDetailsListViewModel();
         private string newId = "12345";
+        private float checkingInterest = 0.05F;
+        private float savingsInterest = 0.03F;
+
+        #region Constructor
 
         public Bank()
         {
 
         }
+
+        #endregion
+
+        #region Properties
 
         public Dictionary<string, AccountBase> Accounts
         {
@@ -34,6 +42,22 @@ namespace MethodSelectorConsole
                 accountDetails = value;
             }
         }
+
+        public float CheckingInterest
+        {
+            get { return checkingInterest; }
+            private set { checkingInterest = value; }
+        }
+
+        public float SavingsInterest
+        {
+            get { return savingsInterest; }
+            private set { savingsInterest = value; }
+        }
+
+        #endregion
+
+        #region Public Methods
 
         public float PerformAction(string name, string action, float amount, AccountType acctType = AccountType.SIMPLE_CHECKING, bool openAcct = false)
         {
@@ -80,6 +104,54 @@ namespace MethodSelectorConsole
             }
             return balance;
         }
+
+        public AccountDetailsViewModel GetDetailsByName(string name)
+        {
+            AccountDetailsViewModel ret = null;
+            var item = accountDetails.AccountDetailsList.ToLookup(x => x.AccountName == name);
+            foreach (var p in item[true])
+            {
+                ret = p;
+            }
+            return ret;
+        }
+
+        public AccountDetailsViewModel AccountDetailsByAccountId(string id)
+        {
+            AccountDetailsViewModel ret = null;
+            var item = accountDetails.AccountDetailsList.ToLookup(x => x.AccountId == id);
+            foreach (var p in item[true])
+            {
+                ret = p;
+            }
+            return ret;
+        }
+
+        public AccountDetailsViewModel GetDetailsByIndex(int idx)
+        {
+            AccountDetailsViewModel details = null;
+            try
+            {
+                details = accountDetails.AccountDetailsList[idx];
+            }
+            catch (Exception e)
+            {
+                System.Diagnostics.Debug.WriteLine(e.Message);
+            }
+            return details;
+        }
+
+        public void DumpAccounts()
+        {
+            foreach (var acct in accounts.Select((x, i) => new { Value = x, Index = i }))
+            {
+                acct.Value.Value.PrintAccountDetails(acct.Index);
+            }
+        }
+
+        #endregion
+
+        #region Private Methods
 
         private float AccountActions(AccountBase account, string action, float amount)
         {
@@ -187,13 +259,7 @@ namespace MethodSelectorConsole
             return account;
         }
 
-        public void DumpAccounts()
-        {
-            foreach (var acct in accounts.Select((x, i) => new { Value = x, Index = i }))
-            {
-                acct.Value.Value.PrintAccountDetails(acct.Index);
-            }
-        }
+        #endregion
 
     }
 }

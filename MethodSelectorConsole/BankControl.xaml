@@ -34,7 +34,7 @@
                             <DataTemplate>
                                 <StackPanel x:Name="acctStackPanel" Orientation="Vertical" Margin="4,1,4,1">
                                     <Label x:Name="acctTypeLabel" Content="{Binding Path=Type}" Width="110" Height="30"/>
-                                    <Button x:Name="accrueInterestButton" Content="Accrue" Visibility="{Binding Path=AddBtn, Converter={StaticResource converter}}" Width="110" Height="30" Margin="3,0,3,6"/>
+                                    <Button x:Name="accrueInterestButton" Content="Accrue" Visibility="{Binding Path=AddBtn, Converter={StaticResource converter}}" Width="110" Height="30" Margin="3,0,3,6" Click="InterestButton_Click"/>
                                 </StackPanel>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
