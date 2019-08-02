@@ -126,15 +126,18 @@ namespace MethodSelectorConsole
                             break;
                         case "accrue":
                         case "a":
-                            Console.WriteLine("Accruing interest on Account: Default is 03%");
+                            AccountDetailsViewModel details = bank.GetDetailsByName(name);
+                            float defaultInterest = ((details.Type == AccountType.INTEREST_CHECKING) ? bank.CheckingInterest : bank.SavingsInterest);
+                            Console.WriteLine("Accruing interest on Account: Default is {0}%", (defaultInterest * 100.0F));
                             Console.WriteLine("Do you want to change it? [y] or [n]");
-                            float interest = 0.03F;
+                            float interest = defaultInterest;
                             entry = Console.ReadLine();
                             if (entry == "y")
                             {
+                                Console.Write("Enter a percent value: ");
                                 entry = Console.ReadLine();
-                                interest = (float)Convert.ToDouble(entry);
-                                Console.WriteLine("Interest changed to: [{0}]", interest);
+                                interest = (float)(Convert.ToDouble(entry) / 100.0D);
+                                Console.WriteLine("Interest changed to: [{0}]", (interest * 100.0F));
                             }
                             try
                             {

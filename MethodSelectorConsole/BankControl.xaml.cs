@@ -112,8 +112,22 @@ namespace MethodSelectorConsole
         private void AcctListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             int idx = (sender as ListView).SelectedIndex;
-            AccountDetailsViewModel details = BankControlForm.Bank.AccountDetailsList.AccountDetailsList[idx];
-            Vm.ActiveAccountName = details.AccountName;
+            AccountDetailsViewModel details = BankControlForm.Bank.GetDetailsByIndex(idx);
+            if (details != null)
+            {
+                Vm.ActiveAccountName = details.AccountName;
+            }
+        }
+
+        private void InterestButton_Click(object sender, RoutedEventArgs e)
+        {
+            AcctListView_SelectionChanged(acctListView, null);
+            AccountDetailsViewModel vm = BankControlForm.Bank.GetDetailsByName(Vm.ActiveAccountName);
+            if (vm != null)
+            {
+                float interest = (vm.Type == AccountType.INTEREST_CHECKING ? BankControlForm.Bank.CheckingInterest : BankControlForm.Bank.SavingsInterest);
+                BankControlForm.Bank.PerformAction(Vm.ActiveAccountName, "accrue", interest);
+            }
         }
     }
 
