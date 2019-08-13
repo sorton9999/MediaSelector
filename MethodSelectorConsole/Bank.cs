@@ -11,7 +11,7 @@ namespace MethodSelectorConsole
 {
     public class Bank
     {
-        private readonly Dictionary<string, AccountBase> accounts = new Dictionary<string, AccountBase>();
+        private readonly Dictionary<string, Account> accounts = new Dictionary<string, Account>();
         private AccountDetailsListViewModel accountDetails = new AccountDetailsListViewModel();
         private string newId = "12345";
         private float checkingInterest = 0.05F;
@@ -28,7 +28,7 @@ namespace MethodSelectorConsole
 
         #region Properties
 
-        public Dictionary<string, AccountBase> Accounts
+        public Dictionary<string, Account> Accounts
         {
             get;
             private set;
@@ -61,7 +61,7 @@ namespace MethodSelectorConsole
 
         public float PerformAction(string name, string action, float amount, AccountType acctType = AccountType.SIMPLE_CHECKING, bool openAcct = false)
         {
-            AccountBase account = null;
+            Account account = null;
             float balance = 0;
             try
             {
@@ -153,7 +153,7 @@ namespace MethodSelectorConsole
 
         #region Private Methods
 
-        private float AccountActions(AccountBase account, string action, float amount)
+        private float AccountActions(Account account, string action, float amount)
         {
             try
             {
@@ -175,7 +175,7 @@ namespace MethodSelectorConsole
             }
         }
 
-        private void UpdateDetails(AccountBase account, float balance)
+        private void UpdateDetails(Account account, float balance)
         {
             var item = accountDetails.AccountDetailsList.ToLookup(x => x.AccountName == account.AccountName);
             foreach (var p in item[true])
@@ -185,10 +185,10 @@ namespace MethodSelectorConsole
             
         }
 
-        private AccountBase MakeAccount(string name, string id, float deposit, AccountType acctType)
+        private Account MakeAccount(string name, string id, float deposit, AccountType acctType)
         {
             Console.WriteLine("<<< Making an account for: [{0}] with initial deposit: [{1}] >>>", name, deposit);
-            AccountBase account = null;
+            Account account = null;
             switch (acctType)
             {
                 case AccountType.SIMPLE_CHECKING:
@@ -236,9 +236,9 @@ namespace MethodSelectorConsole
         //    return (PerformAction(name, action, amt, true, openAcct));
         //}
 
-        private AccountBase FindAccount(string name)
+        private Account FindAccount(string name)
         {
-            AccountBase account = null;
+            Account account = null;
             try
             {
                 var acct = accounts.ToLookup(x => x.Key == name);

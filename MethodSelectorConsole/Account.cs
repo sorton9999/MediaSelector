@@ -9,42 +9,28 @@ namespace MethodSelectorConsole
 {
     public enum AccountType { UNINIT = -99, INTEREST_CHECKING = 0, SIMPLE_CHECKING, SAVINGS, OTHER }
 
-    public abstract class AccountBase
+
+    public abstract class Account : IAccount
     {
-        protected string accountName = String.Empty;
-        protected AccountDetailsViewModel details = new AccountDetailsViewModel();
-
-        public string AccountName
-        {
-            get { return accountName; }
-            private set { accountName = value; }
-        }
-
-
-        public AccountDetailsViewModel AccountDetails
-        {
-            get { return details; }
-            protected set { details = value; }
-        }
-
-        public abstract float AccountAction(string action, float amount);
-
-        public abstract void PrintAccountDetails(int idx);
-
-        public abstract float AccountBalance();
-    }
-
-    public class Account : AccountBase
-    {
-        private readonly MethodSelectorClass selector;
+        private readonly string accountName;
+        private readonly AccountDetailsViewModel details = new AccountDetailsViewModel();
         
-        public Account(string name, string id, float balance)
+        protected Account(string name, string id, float balance)
         {
-            selector = new MethodSelectorClass(balance);
             accountName = name;
             // Default this for now
             details.Type = AccountType.OTHER;
             details.AccountId = id;
+        }
+
+        public string AccountName
+        {
+            get { return accountName; }
+        }
+
+        public AccountDetailsViewModel AccountDetails
+        {
+            get { return details; }
         }
 
         public static string[] LoadAccountTypes()
@@ -53,7 +39,9 @@ namespace MethodSelectorConsole
             return items;
         }
 
-        public float AccountDeposit(float amt)
+        public abstract float AccountAction(string action, float amt);
+
+        public virtual float AccountDeposit(float amt)
         {
             try
             {
@@ -66,7 +54,7 @@ namespace MethodSelectorConsole
             return AccountDetails.Balance;
         }
 
-        public float AccountWithdraw(float amt)
+        public virtual float AccountWithdraw(float amt)
         {
             try
             {
@@ -79,7 +67,7 @@ namespace MethodSelectorConsole
             return AccountDetails.Balance;
         }
 
-        public override float AccountBalance()
+        public virtual float AccountBalance()
         {
             float balance = AccountDetails.Balance;
             try
@@ -91,6 +79,32 @@ namespace MethodSelectorConsole
                 throw;
             }
             return balance;
+        }
+
+        public void PrintAccountDetails(int idx)
+        {
+            AccountDetailsViewModel ad = AccountDetails;
+            Console.WriteLine("=== [{0}] Account Details ===", (idx + 1));
+            Console.WriteLine("Account Name: " + AccountName);
+            Console.WriteLine("Acct Type: " + ad.Type.ToString());
+            Console.WriteLine("Acct ID:   " + ad.AccountId);
+            Console.WriteLine("Balance: " + AccountBalance());
+        }
+    }
+
+    public class SimpleAccount : Account
+    {
+        private readonly MethodSelectorClass selector = null;
+
+        public SimpleAccount(string name, string id, float balance)
+            : base(name, id, balance)
+        {
+            selector = new MethodSelectorClass(balance);
+            AccountDetails.Type = AccountType.SIMPLE_CHECKING;
+            AccountDetails.AccountName = name;
+            AccountDetails.AccountId = id;
+            AccountDetails.Balance = balance;
+            AccountDetails.AddBtn = false;
         }
 
         public override float AccountAction(string action, float amt)
@@ -110,37 +124,6 @@ namespace MethodSelectorConsole
             }
         }
 
-        public override void PrintAccountDetails(int idx)
-        {
-            AccountDetailsViewModel ad = AccountDetails;
-            Console.WriteLine("=== [{0}] Account Details ===", (idx + 1));
-            Console.WriteLine("Account Name: " + AccountName);
-            Console.WriteLine("Acct Type: " + ad.Type.ToString());
-            Console.WriteLine("Acct ID:   " + ad.AccountId);
-            Console.WriteLine("Balance: " + AccountBalance());
-        }
-    }
-
-    public class SimpleAccount : Account
-    {
-        private readonly MethodSelectorExtensionClass selector = null;
-
-        public SimpleAccount(string name, string id, float balance)
-            : base(name, id, balance)
-        {
-            selector = new MethodSelectorExtensionClass(balance);
-            AccountDetails.Type = AccountType.SIMPLE_CHECKING;
-            AccountDetails.AccountName = name;
-            AccountDetails.AccountId = id;
-            AccountDetails.Balance = balance;
-            AccountDetails.AddBtn = false;
-        }
-
-        //public override float AccountAction(string action, float amt)
-        //{
-        //    return base.AccountAction(action, amt);
-        //}
-
     }
 
     public class InterestAccount : Account
@@ -148,7 +131,7 @@ namespace MethodSelectorConsole
         private readonly MethodSelectorExtensionClass selector = null;
 
         public InterestAccount(string name, string id, float balance)
-            : base(name, id, balance)
+            : base (name, id, balance)
         {
             selector = new MethodSelectorExtensionClass(balance);
             AccountDetails.Type = AccountType.INTEREST_CHECKING;
@@ -188,7 +171,7 @@ namespace MethodSelectorConsole
         private readonly MethodSelectorExtensionClass selector = null;
 
         public SavingsAccount(string name, string id, float balance)
-            : base(name, id, balance)
+            : base (name, id, balance)
         {
             selector = new MethodSelectorExtensionClass(balance);
             AccountDetails.Type = AccountType.SAVINGS;
