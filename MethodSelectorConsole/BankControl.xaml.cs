@@ -117,6 +117,7 @@ namespace MethodSelectorConsole
             {
                 Vm.ActiveAccountName = details.AccountName;
             }
+            acctDetailsPanel.Visibility = Visibility.Hidden;
         }
 
         private void InterestButton_Click(object sender, RoutedEventArgs e)
@@ -127,6 +128,17 @@ namespace MethodSelectorConsole
             {
                 float interest = (vm.Type == AccountType.INTEREST_CHECKING ? BankControlForm.Bank.CheckingInterest : BankControlForm.Bank.SavingsInterest);
                 BankControlForm.Bank.PerformAction(Vm.ActiveAccountName, "accrue", interest);
+            }
+        }
+
+        private void DetailsButton_Click(object sender, RoutedEventArgs e)
+        {
+            string name = acctTextBox.Text;
+            AccountDetailsViewModel vm = BankControlForm.Bank.GetDetailsByName(name);
+            if (vm != null)
+            {
+                acctDetailsGrid.DataContext = vm;
+                acctDetailsPanel.Visibility = Visibility.Visible;
             }
         }
     }
