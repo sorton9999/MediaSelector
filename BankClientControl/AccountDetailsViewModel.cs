@@ -4,8 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MethodSelectorConsole
+namespace BankClientControl
 {
+    //public enum AccountType { UNINIT = -99, INTEREST_CHECKING = 0, SIMPLE_CHECKING, SAVINGS, OTHER }
+
     public class AccountDetailsViewModel : ViewModelBase
     {
         //private string accountName = "nobody";
@@ -13,7 +15,10 @@ namespace MethodSelectorConsole
         //private string accountId = "0";
         //private float accountBalance = 0F;
         //private bool addBtn = false;
+
         CommonClasses.AccountDetailsModel model = new CommonClasses.AccountDetailsModel();
+
+        private string strOut = String.Empty;
 
         public string AccountName
         {
@@ -58,6 +63,16 @@ namespace MethodSelectorConsole
             set
             {
                 model.addBtn = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        public string StrOut
+        {
+            get { return strOut; }
+            set
+            {
+                strOut = value;
                 NotifyPropertyChanged();
             }
         }

@@ -13,9 +13,8 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using CommonClasses;
 
-namespace MethodSelectorConsole
+namespace BankControl
 {
     /// <summary>
     /// Interaction logic for BankControl.xaml
@@ -24,7 +23,7 @@ namespace MethodSelectorConsole
     {
         private AccountNameViewModel vm = new AccountNameViewModel();
 
-        private static TransactionServer _server;
+       // private static TransactionServer _server;
 
         public BankControl()
         {

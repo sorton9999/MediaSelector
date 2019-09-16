@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 using MethodSelector;
+using CommonClasses;
 
 namespace MethodSelectorConsole
 {

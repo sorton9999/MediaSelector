@@ -4,30 +4,28 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MethodSelectorConsole
+namespace BankControl
 {
     public class AccountNameViewModel : ViewModelBase
     {
-        //private string name = null;
-        //private string errorString = "";
-        CommonClasses.AccountNameModel model = new CommonClasses.AccountNameModel();
-
+        private string name = null;
+        private string errorString = "";
         public string ActiveAccountName
         {
-            get { return model.name; }
+            get { return name; }
             set
             {
-                model.name = value;
+                name = value;
                 NotifyPropertyChanged();
             }
         }
 
         public string ErrorString
         {
-            get { return model.errorString; }
+            get { return errorString; }
             set
             {
-                model.errorString = value;
+                errorString = value;
                 NotifyPropertyChanged();
             }
         }
