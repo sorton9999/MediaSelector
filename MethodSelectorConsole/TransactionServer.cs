@@ -18,7 +18,7 @@ namespace MethodSelectorConsole
 
         ClientStore clients;
         TxDataGetter tx = new TxDataGetter();
-        Action<MessageData> msgAction;
+        //Action<MessageData> msgAction;
         ThreadedListener listenerThread;
 
         bool done = false;
@@ -26,11 +26,83 @@ namespace MethodSelectorConsole
         public TransactionServer(Bank bank)
         {
             _bank = bank;
-            msgAction = ReceiveData;
-            clients = new ClientStore(msgAction);
+            //msgAction = ReceiveData;
+            clients = new ClientStore();
             ClientConnectAsync.OnConnect += ClientConnectAsync_OnConnect;
+            ThreadedReceiver.DataReceived += ThreadedReceiver_DataReceived;
             listenerThread = new ThreadedListener(tx);
             listenerThread.Run(clients);
+        }
+
+        private void ThreadedReceiver_DataReceived(object sender, AsyncCompletedEventArgs e)
+        {
+            if (e.Error == null)
+            {
+                ReceiveData data = e.UserState as ReceiveData;
+                if (data != null)
+                {
+                    MessageData msg = data.clientData;
+                    if ((msg != null) && (msg.id > 0))
+                    {
+                        System.Diagnostics.Debug.WriteLine("Received Message Type: {0}", msg.id);
+                        Client client = ClientStore.FindClient(data.clientHandle);
+                        if (client != null)
+                        {
+                            System.Diagnostics.Debug.WriteLine("   From Client: {0}", data.clientHandle);
+
+                            switch (msg.id)
+                            {
+                                case MessageTypes.OpenAcctMsgType:
+                                    ProcessOpenAccount();
+                                    break;
+                                case MessageTypes.AccountDetailsMsgType:
+                                    ProcessAccountDetails();
+                                    break;
+                                case MessageTypes.AccountListMsgType:
+                                    ProcessAccountList();
+                                    break;
+                                case MessageTypes.ClientIdMsgType:
+                                    ProcessAccountId();
+                                    break;
+                                case MessageTypes.TxMsgType:
+                                    ProcessTransaction();
+                                    break;
+                                default:
+                                    System.Diagnostics.Debug.WriteLine("Received unsupported msg type: {0}", msg.id);
+                                    break;
+                            }
+
+
+                            client.ClearData();
+                        }
+                    }
+                }
+            }
+        }
+
+        private void ProcessTransaction()
+        {
+            System.Diagnostics.Debug.WriteLine("Processing Transaction message");
+        }
+
+        private void ProcessAccountId()
+        {
+            System.Diagnostics.Debug.WriteLine("Processing Account ID message");
+        }
+
+        private void ProcessAccountList()
+        {
+            System.Diagnostics.Debug.WriteLine("Processing Account List message");
+        }
+
+        private void ProcessAccountDetails()
+        {
+            System.Diagnostics.Debug.WriteLine("Processing Account Details message");
+        }
+
+        private void ProcessOpenAccount()
+        {
+            System.Diagnostics.Debug.WriteLine("Processing Open Account message");
         }
 
         private void ClientConnectAsync_OnConnect(System.Net.Sockets.Socket socket)
@@ -45,10 +117,10 @@ namespace MethodSelectorConsole
             }
         }
 
-        public void ReceiveData(MessageData data)
-        {
-            Console.WriteLine("<<<<< Received Message of Type: {0} >>>>>", data.id);
-        }
+        //public void ReceiveData(MessageData data)
+        //{
+        //    Console.WriteLine("<<<<< Received Message of Type: {0} >>>>>", data.id);
+        //}
 
         public bool ServerIsDone
         {

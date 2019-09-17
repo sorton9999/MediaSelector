@@ -83,12 +83,24 @@ namespace BankClientControl
             string first = firstNameTextBox.Text;
             string last = lastNameTextBox.Text;
             string deposit = depositTextBox.Text;
-            OpenAcctDataGetter getter = new OpenAcctDataGetter(first, last, deposit);
+            //OpenAcctDataGetter getter = new OpenAcctDataGetter(first, last, deposit);
+            TxDataGetter getter = new TxDataGetter();
+            AccountDetailsModel details = new AccountDetailsModel();
+            details.accountBalance = (float)Convert.ToDouble(deposit);
+            details.accountName = first;
+            getter.AccountDetails = details;
+
+            // The data should send across in the library sender class
+            BankClient.TcpClient().SetData(details);
+
+            /*
             var eventData = GetDataAsync.GetMessageDataAsync(getter, MessageTypes.OpenAcctMsgType);
             if (eventData != null)
             {
                 try
                 {
+                    eventData.Result.name = "openacct";
+
                     var sendResult = SendMessageAsync.SendMsgAsync(BankClient.ClientSocket, eventData.Result);
 
                     if (sendResult.Result.Failure)
@@ -101,6 +113,8 @@ namespace BankClientControl
                     System.Diagnostics.Debug.WriteLine("Send Exception: " + ex.Message);
                 }
             }
+            */
+
         }
     }
 }

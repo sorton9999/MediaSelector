@@ -14,6 +14,7 @@ namespace BankClientControl
         ClientConnectAsync conn;
         MessageData data = new MessageData();
         Client tcpClient;
+        TxDataGetter dataGetter = new TxDataGetter();
         Socket _clientSocket;
         string _ip = String.Empty;
         int _port = 0;
@@ -71,7 +72,7 @@ namespace BankClientControl
                 return false;
             }
             _clientSocket = connectResult.Result.Value;
-            tcpClient = new Client(_clientSocket, 1024);
+            tcpClient = new Client(_clientSocket, 1024, dataGetter);
             
             return _clientSocket.Connected;
         }

@@ -11,63 +11,96 @@ namespace MethodSelectorConsole
     public class ListDataGetter : IDataGetter
     {
         Bank bank = null;
+        const int MsgType = MessageTypes.AccountListMsgType;
 
         public ListDataGetter(Bank bank)
         {
             this.bank = bank;
         }
 
-        public MessageData GetData(int msgType)
+        public MessageData GetData()
         {
             MessageData data = new MessageData();
             List<AccountDetailsModel> list = new List<AccountDetailsModel>();
 
-            switch (msgType)
+            foreach (var item in bank.AccountDetailsList.AccountDetailsList)
             {
-                case MessageTypes.AccountListMsgType:
-                    foreach (var item in bank.AccountDetailsList.AccountDetailsList)
-                    {
-                        AccountDetailsModel model = new AccountDetailsModel();
-                        model.accountBalance = item.Balance;
-                        model.accountId = item.AccountId;
-                        model.accountName = item.AccountName;
-                        model.accountType = item.Type;
-                        model.addBtn = item.AddBtn;
-                        list.Add(model);
-                    }
-                    data.id = msgType;
-                    data.name = "AccountList";
-                    data.message = list;
-                    break;
-                case MessageTypes.AccountDetailsMsgType:
-                case MessageTypes.ClientIdMsgType:
-                default:
-                    System.Diagnostics.Debug.WriteLine("Unsupported message type: " + msgType);
-                    break;
-        }
+                AccountDetailsModel model = new AccountDetailsModel();
+                model.accountBalance = item.Balance;
+                model.accountId = item.AccountId;
+                model.accountName = item.AccountName;
+                model.accountType = item.Type;
+                model.addBtn = item.AddBtn;
+                list.Add(model);
+            }
+            data.id = MsgType;
+            data.name = "AccountList";
+            data.message = list;
+
             return data;
+        }
+
+        public MessageData GetData(long handle)
+        {
+            MessageData data = new MessageData();
+            List<AccountDetailsModel> list = new List<AccountDetailsModel>();
+
+            foreach (var item in bank.AccountDetailsList.AccountDetailsList)
+            {
+                AccountDetailsModel model = new AccountDetailsModel();
+                model.accountBalance = item.Balance;
+                model.accountId = item.AccountId;
+                model.accountName = item.AccountName;
+                model.accountType = item.Type;
+                model.addBtn = item.AddBtn;
+                list.Add(model);
+            }
+            data.id = MsgType;
+            data.handle = handle;
+            data.name = "AccountList";
+            data.message = list;
+
+            return data;
+        }
+
+        public void SetData(object data)
+        {
+
         }
     }
 
     public class ClientIdDataGetter : IDataGetter
     {
         int clientId = 0;
+        const int MsgType = MessageTypes.ClientIdMsgType;
 
         public ClientIdDataGetter(int id)
         {
             clientId = id;
         }
 
-        public MessageData GetData(int msgType)
+        public MessageData GetData()
         {
             MessageData data = new MessageData();
-            if (msgType == MessageTypes.ClientIdMsgType)
-            {
-                data.id = msgType;
-                data.name = "ClientId";
-                data.message = clientId;
-            }
+            data.id = MsgType;
+            data.name = "ClientId";
+            data.message = clientId;
             return data;
+        }
+
+        public MessageData GetData(long handle)
+        {
+            MessageData data = new MessageData();
+            data.id = MsgType;
+            data.handle = handle;
+            data.name = "ClientId";
+            data.message = clientId;
+            return data;
+        }
+
+        public void SetData(object data)
+        {
+
         }
     }
 
@@ -75,6 +108,7 @@ namespace MethodSelectorConsole
     {
         string accountId = String.Empty;
         Bank _bank;
+        const int MsgType = MessageTypes.AccountDetailsMsgType;
 
         public AccountDetailsDataGetter(string id, Bank bank)
         {
@@ -82,32 +116,59 @@ namespace MethodSelectorConsole
             _bank = bank;
         }
 
-        public MessageData GetData(int msgType)
+        public MessageData GetData()
         {
             MessageData data = new MessageData();
-            if (msgType == MessageTypes.AccountDetailsMsgType)
+            AccountDetailsViewModel vm = _bank.AccountDetailsByAccountId(accountId);
+            if (vm != null)
             {
-                AccountDetailsViewModel vm = _bank.AccountDetailsByAccountId(accountId);
-                if (vm != null)
-                {
-                    AccountDetailsModel model = new AccountDetailsModel();
-                    model.accountBalance = vm.Balance;
-                    model.accountId = vm.AccountId;
-                    model.accountName = vm.AccountName;
-                    model.accountType = vm.Type;
-                    model.addBtn = vm.AddBtn;
-                    data.id = msgType;
-                    data.name = "AccountDetails";
-                    data.message = model;
-                }
+                AccountDetailsModel model = new AccountDetailsModel();
+                model.accountBalance = vm.Balance;
+                model.accountId = vm.AccountId;
+                model.accountName = vm.AccountName;
+                model.accountType = vm.Type;
+                model.addBtn = vm.AddBtn;
+                data.id = MsgType;
+                data.name = "AccountDetails";
+                data.message = model;
             }
             return data;
+        }
+
+        public MessageData GetData(long handle)
+        {
+            MessageData data = new MessageData();
+            AccountDetailsViewModel vm = _bank.AccountDetailsByAccountId(accountId);
+            if (vm != null)
+            {
+                AccountDetailsModel model = new AccountDetailsModel();
+                model.accountBalance = vm.Balance;
+                model.accountId = vm.AccountId;
+                model.accountName = vm.AccountName;
+                model.accountType = vm.Type;
+                model.addBtn = vm.AddBtn;
+                data.id = MsgType;
+                data.handle = handle;
+                data.name = "AccountDetails";
+                data.message = model;
+            }
+            return data;
+        }
+
+        public void SetData(object data)
+        {
+            string acctId = data as string;
+            if (!String.IsNullOrEmpty(acctId))
+            {
+                accountId = acctId;
+            }
         }
     }
 
     public class TxDataGetter : IDataGetter
     {
         AccountDetailsModel details;
+        const int MsgType = MessageTypes.TxMsgType;
 
         public TxDataGetter()
         {
@@ -119,10 +180,10 @@ namespace MethodSelectorConsole
             set { details = value; }
         }
 
-        public MessageData GetData(int msgType)
+        public MessageData GetData()
         {
             MessageData data = new MessageData();
-            if ((details != null) && (msgType == MessageTypes.TxMsgType))
+            if (details != null)
             {
                 Transaction tx = new Transaction();
                 tx.acctFirstName = String.Empty;
@@ -133,7 +194,38 @@ namespace MethodSelectorConsole
                 tx.txAmount = 0;
                 tx.txOperation = "tx";
             }
+            data.id = MsgType;
+            data.name = "tx";
             return data;
+        }
+
+        public MessageData GetData(long handle)
+        {
+            MessageData data = new MessageData();
+            if (details != null)
+            {
+                Transaction tx = new Transaction();
+                tx.acctFirstName = String.Empty;
+                tx.acctId = Convert.ToInt32(details.accountId);
+                tx.acctLastName = details.accountName;
+                tx.acctType = details.accountType;
+                tx.balance = details.accountBalance;
+                tx.txAmount = 0;
+                tx.txOperation = "tx";
+            }
+            data.handle = handle;
+            data.id = MsgType;
+            data.name = "tx";
+            return data;
+        }
+
+        public void SetData(object data)
+        {
+            AccountDetailsModel det = data as AccountDetailsModel;
+            if (det != null)
+            {
+                details = det;
+            }
         }
     }
 }
