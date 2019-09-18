@@ -129,7 +129,7 @@ namespace MethodSelectorConsole
                             break;
                         case "accrue":
                         case "a":
-                            AccountDetailsViewModel details = bank.GetDetailsByName(name);
+                            AccountDetailsViewModel details = bank.AccountDetailsByAccountId(acctId);
                             float defaultInterest = ((details.Type == AccountType.INTEREST_CHECKING) ? bank.CheckingInterest : bank.SavingsInterest);
                             Console.WriteLine("Accruing interest on Account: Default is {0}%", (defaultInterest * 100.0F));
                             Console.WriteLine("Do you want to change it? [y] or [n]");
@@ -158,11 +158,27 @@ namespace MethodSelectorConsole
                             amt = 0;
                             try
                             {
-                                AccountDetailsViewModel vm = bank.GetDetailsByName(name);
+                                AccountDetailsViewModel[] vm = bank.GetDetailsByName(name);
+                                string choice = String.Empty;
+                                if (vm.Count() > 1)
+                                {
+                                    Console.Write("Which Acct? ");
+                                    foreach (var v in vm.Select((x, i) => new { x, i }))
+                                    {
+                                        Console.Write("[{0}]: {1} - {2}, ", v.i, v.x.AccountId, v.x.Type.ToString());
+                                    }
+                                    Console.WriteLine(Environment.NewLine + "Choose One: ");
+                                    choice = Console.ReadLine();
+                                }
+                                int chosenIdx = 0;
+                                if (!String.IsNullOrEmpty(choice))
+                                {
+                                    chosenIdx = Convert.ToInt32(choice);
+                                }
                                 string id = "0";
                                 if (vm != null)
                                 {
-                                    id = vm.AccountId;
+                                    id = vm[chosenIdx].AccountId;
                                 }
                                 acctId = id;
                                 balance = bank.PerformAction(acctId, name, "balance", 0);

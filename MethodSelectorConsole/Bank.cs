@@ -106,13 +106,18 @@ namespace MethodSelectorConsole
             return balance;
         }
 
-        public AccountDetailsViewModel GetDetailsByName(string name)
+        public AccountDetailsViewModel[] GetDetailsByName(string name)
         {
-            AccountDetailsViewModel ret = null;
+            AccountDetailsViewModel[] ret = null;
             var item = accountDetails.AccountDetailsList.ToLookup(x => x.AccountName == name);
-            foreach (var p in item[true])
+            var t = item[true];
+            if (t.Count() > 0)
             {
-                ret = p;
+                ret = new AccountDetailsViewModel[t.Count()];
+                foreach (var p in t.Select((x, i) => new { x,i }))
+                {
+                    ret[p.i] = p.x;
+                }
             }
             return ret;
         }
@@ -137,7 +142,7 @@ namespace MethodSelectorConsole
             }
             catch (Exception e)
             {
-                System.Diagnostics.Debug.WriteLine(e.Message);
+                throw new BankingException("Details not found at IDX: " + idx);
             }
             return details;
         }
@@ -189,7 +194,7 @@ namespace MethodSelectorConsole
 
         private void UpdateDetails(Account account, float balance)
         {
-            var item = accountDetails.AccountDetailsList.ToLookup(x => x.AccountName == account.AccountName);
+            var item = accountDetails.AccountDetailsList.ToLookup(x => x.AccountId == account.AccountDetails.AccountId);
             foreach (var p in item[true])
             {
                 p.Balance = balance;
