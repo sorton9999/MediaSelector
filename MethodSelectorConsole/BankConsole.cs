@@ -165,9 +165,9 @@ namespace MethodSelectorConsole
                                     Console.Write("Which Acct? ");
                                     foreach (var v in vm.Select((x, i) => new { x, i }))
                                     {
-                                        Console.Write("[{0}]: {1} - {2}, ", v.i, v.x.AccountId, v.x.Type.ToString());
+                                        Console.Write("[{0}]: {1} - {2} ; ", v.i, v.x.AccountId, v.x.Type.ToString());
                                     }
-                                    Console.WriteLine(Environment.NewLine + "Choose One: ");
+                                    Console.Write(Environment.NewLine + "Choose One: ==> ");
                                     choice = Console.ReadLine();
                                 }
                                 int chosenIdx = 0;

@@ -74,19 +74,34 @@ namespace BankClientControl
             set { details = value; }
         }
 
+        public Transaction TransactionDetails
+        {
+            get;
+            set;
+        }
+
         public MessageData GetData()
         {
             MessageData data = new MessageData();
             if (details != null)
             {
                 Transaction tx = new Transaction();
-                tx.acctFirstName = String.Empty;
-                tx.acctId = Convert.ToInt32(details.accountId);
-                tx.acctLastName = details.accountName;
-                tx.acctType = details.accountType;
-                tx.balance = details.accountBalance;
-                tx.txAmount = 0;
-                tx.txOperation = "tx";
+                //tx.acctFirstName = String.Empty;
+                //tx.acctId = Convert.ToInt32(details.accountId);
+                //tx.acctLastName = details.accountName;
+                //tx.acctType = details.accountType;
+                //tx.balance = details.accountBalance;
+                //tx.txAmount = 0;
+                //tx.txOperation = "tx";
+                tx.acctFirstName = TransactionDetails.acctFirstName;
+                tx.acctId = TransactionDetails.acctId;
+                tx.acctLastName = TransactionDetails.acctLastName;
+                tx.acctType = TransactionDetails.acctType;
+                tx.balance = TransactionDetails.balance;
+                tx.txAmount = TransactionDetails.txAmount;
+                tx.txOperation = TransactionDetails.txOperation;
+
+                data.message = tx;
             }
             data.id = MsgType;
             return data;
@@ -119,10 +134,15 @@ namespace BankClientControl
 
         public void SetData(object data)
         {
-            AccountDetailsModel model = data as AccountDetailsModel;
-            if (model != null)
+            //AccountDetailsModel model = data as AccountDetailsModel;
+            //if (model != null)
+            //{
+            //    details = model;
+            //}
+            Transaction tx = data as Transaction;
+            if (tx != null)
             {
-                details = model;
+                TransactionDetails = tx;
             }
         }
     }

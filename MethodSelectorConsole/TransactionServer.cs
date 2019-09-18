@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using CliServLib;
 using TcpLib;
 using CommonClasses;
+using MethodSelector;
 
 namespace MethodSelectorConsole
 {
@@ -50,26 +51,33 @@ namespace MethodSelectorConsole
                         {
                             System.Diagnostics.Debug.WriteLine("   From Client: {0}", data.clientHandle);
 
-                            switch (msg.id)
+                            try
                             {
-                                case MessageTypes.OpenAcctMsgType:
-                                    ProcessOpenAccount();
-                                    break;
-                                case MessageTypes.AccountDetailsMsgType:
-                                    ProcessAccountDetails();
-                                    break;
-                                case MessageTypes.AccountListMsgType:
-                                    ProcessAccountList();
-                                    break;
-                                case MessageTypes.ClientIdMsgType:
-                                    ProcessAccountId();
-                                    break;
-                                case MessageTypes.TxMsgType:
-                                    ProcessTransaction();
-                                    break;
-                                default:
-                                    System.Diagnostics.Debug.WriteLine("Received unsupported msg type: {0}", msg.id);
-                                    break;
+                                switch (msg.id)
+                                {
+                                    case MessageTypes.OpenAcctMsgType:
+                                        ProcessOpenAccount(msg);
+                                        break;
+                                    case MessageTypes.AccountDetailsMsgType:
+                                        ProcessAccountDetails(msg);
+                                        break;
+                                    case MessageTypes.AccountListMsgType:
+                                        ProcessAccountList(msg);
+                                        break;
+                                    case MessageTypes.ClientIdMsgType:
+                                        ProcessAccountId(msg);
+                                        break;
+                                    case MessageTypes.TxMsgType:
+                                        ProcessTransaction(msg);
+                                        break;
+                                    default:
+                                        System.Diagnostics.Debug.WriteLine("Received unsupported msg type: {0}", msg.id);
+                                        break;
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                System.Diagnostics.Debug.WriteLine("Transaction Exception: " + ex.Message);
                             }
 
 
@@ -80,27 +88,44 @@ namespace MethodSelectorConsole
             }
         }
 
-        private void ProcessTransaction()
+        private void ProcessTransaction(MessageData data)
         {
             System.Diagnostics.Debug.WriteLine("Processing Transaction message");
+            if (data.id != MessageTypes.TxMsgType)
+            {
+                throw new BankingException("Invalid Transaction Type: " + data.id);
+            }
+            Transaction tx = data.message as Transaction;
+            if (tx != null)
+            {
+                switch (tx.txOperation)
+                {
+                    case "open":
+                        _bank.PerformAction(tx.acctId.ToString(), tx.acctLastName, tx.txOperation, tx.txAmount, tx.acctType, true);
+                        break;
+                    default:
+                        throw new BankingException("Invalid Transaction Name: " + data.name);
+                        break;
+                }
+            }
         }
 
-        private void ProcessAccountId()
+        private void ProcessAccountId(MessageData data)
         {
             System.Diagnostics.Debug.WriteLine("Processing Account ID message");
         }
 
-        private void ProcessAccountList()
+        private void ProcessAccountList(MessageData data)
         {
             System.Diagnostics.Debug.WriteLine("Processing Account List message");
         }
 
-        private void ProcessAccountDetails()
+        private void ProcessAccountDetails(MessageData data)
         {
             System.Diagnostics.Debug.WriteLine("Processing Account Details message");
         }
 
-        private void ProcessOpenAccount()
+        private void ProcessOpenAccount(MessageData data)
         {
             System.Diagnostics.Debug.WriteLine("Processing Open Account message");
         }

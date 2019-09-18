@@ -85,13 +85,21 @@ namespace BankClientControl
             string deposit = depositTextBox.Text;
             //OpenAcctDataGetter getter = new OpenAcctDataGetter(first, last, deposit);
             TxDataGetter getter = new TxDataGetter();
-            AccountDetailsModel details = new AccountDetailsModel();
-            details.accountBalance = (float)Convert.ToDouble(deposit);
-            details.accountName = first;
-            getter.AccountDetails = details;
+            //AccountDetailsModel details = new AccountDetailsModel();
+            //details.accountBalance = (float)Convert.ToDouble(deposit);
+            //details.accountName = first;
+            //getter.AccountDetails = details;
+
+            Transaction tx = new Transaction();
+            tx.acctFirstName = first;
+            tx.acctLastName = last;
+            tx.txAmount = (float)Convert.ToDouble(deposit);
+            tx.txOperation = "open";
+
+            getter.TransactionDetails = tx;
 
             // The data should send across in the library sender class
-            BankClient.TcpClient().SetData(details);
+            BankClient.TcpClient().SetData(tx);
 
             /*
             var eventData = GetDataAsync.GetMessageDataAsync(getter, MessageTypes.OpenAcctMsgType);
