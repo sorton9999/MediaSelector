@@ -38,6 +38,7 @@ namespace MethodSelectorConsole
 
         private void OpenButton_Click(object sender, RoutedEventArgs e)
         {
+            string acctId = BankControlForm.Bank.GetNewAcctId();
             Vm.ErrorString = String.Empty;
             try
             {
@@ -47,15 +48,15 @@ namespace MethodSelectorConsole
                 float amt = (float)Convert.ToDouble(entryTextBox.Text);
                 if (type == AccountType.SIMPLE_CHECKING)
                 {
-                    BankControlForm.Bank.PerformAction(name, "deposit", amt, type, true);
+                    BankControlForm.Bank.PerformAction(acctId, name, "deposit", amt, type, true);
                 }
                 else if (type == AccountType.INTEREST_CHECKING)
                 {
-                    BankControlForm.Bank.PerformAction(name, "accrue", amt, type, true);
+                    BankControlForm.Bank.PerformAction(acctId, name, "accrue", amt, type, true);
                 }
                 else if (type == AccountType.SAVINGS)
                 {
-                    BankControlForm.Bank.PerformAction(name, "accrue", amt, type, true);
+                    BankControlForm.Bank.PerformAction(acctId, name, "accrue", amt, type, true);
                 }
                 else
                 {
@@ -88,8 +89,9 @@ namespace MethodSelectorConsole
             try
             {
                 string name = acctTextBox.Text;
+                string id = BankControlForm.Bank.GetDetailsByName(name).AccountId;
                 float amt = (float)Convert.ToDouble(entryTextBox.Text);
-                BankControlForm.Bank.PerformAction(name, "deposit", amt);
+                BankControlForm.Bank.PerformAction(id, name, "deposit", amt);
             }
             catch (Exception ex)
             {
@@ -104,8 +106,9 @@ namespace MethodSelectorConsole
             try
             {
                 string name = acctTextBox.Text;
+                string id = BankControlForm.Bank.GetDetailsByName(name).AccountId;
                 float amt = (float)Convert.ToDouble(entryTextBox.Text);
-                BankControlForm.Bank.PerformAction(name, "withdraw", amt);
+                BankControlForm.Bank.PerformAction(id, name, "withdraw", amt);
             }
             catch (Exception ex)
             {
@@ -132,7 +135,7 @@ namespace MethodSelectorConsole
             if (vm != null)
             {
                 float interest = (vm.Type == AccountType.INTEREST_CHECKING ? BankControlForm.Bank.CheckingInterest : BankControlForm.Bank.SavingsInterest);
-                BankControlForm.Bank.PerformAction(Vm.ActiveAccountName, "accrue", interest);
+                BankControlForm.Bank.PerformAction(vm.AccountId, Vm.ActiveAccountName, "accrue", interest);
             }
         }
 

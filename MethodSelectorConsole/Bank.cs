@@ -14,9 +14,11 @@ namespace MethodSelectorConsole
     {
         private readonly Dictionary<string, Account> accounts = new Dictionary<string, Account>();
         private AccountDetailsListViewModel accountDetails = new AccountDetailsListViewModel();
-        private string newId = "12345";
         private float checkingInterest = 0.05F;
         private float savingsInterest = 0.03F;
+
+        public const string InitialID = "12345";
+        public string latestAcctId = InitialID;
 
         #region Constructor
 
@@ -60,22 +62,20 @@ namespace MethodSelectorConsole
 
         #region Public Methods
 
-        public float PerformAction(string name, string action, float amount, AccountType acctType = AccountType.SIMPLE_CHECKING, bool openAcct = false)
+        public float PerformAction(string id, string name, string action, float amount, AccountType acctType = AccountType.SIMPLE_CHECKING, bool openAcct = false)
         {
             Account account = null;
             float balance = 0;
             try
             {
-                account = FindAccount(name);
+                account = FindAccount(id);
             }
             catch (MethodSelector.AccountNotFoundException e)
             {
                 Console.WriteLine(e.Message);
                 if (openAcct)
                 {
-                    long id = Convert.ToInt64(newId);
-                    newId = (++id).ToString();
-                    account = MakeAccount(name, newId, amount, acctType);
+                    account = MakeAccount(name, id, amount, acctType);
                 }
                 else
                 {
@@ -150,6 +150,17 @@ namespace MethodSelectorConsole
             }
         }
 
+        public string GetNewAcctId()
+        {
+            string newId = latestAcctId;
+
+            long id = Convert.ToInt64(newId);
+            newId = (++id).ToString();
+            latestAcctId = newId;
+
+            return newId;
+        }
+
         #endregion
 
         #region Private Methods
@@ -220,7 +231,7 @@ namespace MethodSelectorConsole
             {
                 try
                 {
-                    accounts.Add(name, account);
+                    accounts.Add(id, account);
                     accountDetails.AccountDetailsList.Add(account.AccountDetails);
                 }
                 catch (Exception e)
@@ -237,12 +248,12 @@ namespace MethodSelectorConsole
         //    return (PerformAction(name, action, amt, true, openAcct));
         //}
 
-        private Account FindAccount(string name)
+        private Account FindAccount(string id)
         {
             Account account = null;
             try
             {
-                var acct = accounts.ToLookup(x => x.Key == name);
+                var acct = accounts.ToLookup(x => x.Key == id);
                 foreach (var p in acct[true])
                 {
                     account = p.Value;
@@ -251,11 +262,11 @@ namespace MethodSelectorConsole
             catch (Exception e)
             {
                 System.Diagnostics.Debug.WriteLine("FindAccount: " + e.Message);
-                throw new AccountNotFoundException("Account Not Found: [" + name + "]");
+                throw new AccountNotFoundException("Account Not Found: [" + id + "]");
             }
             if (account == null)
             {
-                throw new AccountNotFoundException("Account Not Found: [" + name + "]");
+                throw new AccountNotFoundException("Account Not Found: [" + id + "]");
             }
             return account;
         }
