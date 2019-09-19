@@ -110,16 +110,16 @@ namespace BankClientControl
         public MessageData GetData(long handle)
         {
             MessageData data = new MessageData();
-            if (details != null)
+            if (TransactionDetails != null)
             {
                 Transaction tx = new Transaction();
-                tx.acctFirstName = String.Empty;
-                tx.acctId = Convert.ToInt32(details.accountId);
-                tx.acctLastName = details.accountName;
-                tx.acctType = details.accountType;
-                tx.balance = details.accountBalance;
-                tx.txAmount = 0;
-                tx.txOperation = "tx";
+                tx.acctFirstName = TransactionDetails.acctFirstName;
+                tx.acctId = TransactionDetails.acctId;
+                tx.acctLastName = TransactionDetails.acctLastName;
+                tx.acctType = TransactionDetails.acctType;
+                tx.balance = TransactionDetails.balance;
+                tx.txAmount = TransactionDetails.txAmount;
+                tx.txOperation = TransactionDetails.txOperation;
 
                 data.message = tx;
             }
@@ -127,7 +127,7 @@ namespace BankClientControl
             data.id = MsgType;
 
             // Prevent data ring
-            details = null;
+            TransactionDetails = null;
 
             return data;
         }

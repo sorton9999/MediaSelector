@@ -15,8 +15,8 @@ namespace MethodSelectorConsole
         static Bank _bank = null;
         public BankControlForm(string name, Bank bank)
         {
-            InitializeComponent();
             _bank = bank;
+            InitializeComponent();
             bankControl1.Vm.ActiveAccountName = name;
             bankControl1.acctListView.ItemsSource = _bank.AccountDetailsList.AccountDetailsList;
         }

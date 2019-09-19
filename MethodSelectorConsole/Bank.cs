@@ -237,7 +237,8 @@ namespace MethodSelectorConsole
                 try
                 {
                     accounts.Add(id, account);
-                    accountDetails.AccountDetailsList.Add(account.AccountDetails);
+                    //accountDetails.AccountDetailsList.Add(account.AccountDetails);
+                    AccountDetailsListViewModel.addAction.Invoke(account.AccountDetails);
                 }
                 catch (Exception e)
                 {

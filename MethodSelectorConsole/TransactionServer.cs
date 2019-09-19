@@ -101,7 +101,12 @@ namespace MethodSelectorConsole
                 switch (tx.txOperation)
                 {
                     case "open":
-                        _bank.PerformAction(tx.acctId.ToString(), tx.acctLastName, tx.txOperation, tx.txAmount, tx.acctType, true);
+                        string id = tx.acctId.ToString();
+                        if (String.IsNullOrEmpty(id) || (String.Compare(id, "0") == 0))
+                        {
+                            id = BankControlForm.Bank.GetNewAcctId();
+                        }
+                        _bank.PerformAction(id, tx.acctLastName, tx.txOperation, tx.txAmount, tx.acctType, true);
                         break;
                     default:
                         throw new BankingException("Invalid Transaction Name: " + data.name);
