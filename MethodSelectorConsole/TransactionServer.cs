@@ -58,22 +58,22 @@ namespace MethodSelectorConsole
                                 switch (msg.id)
                                 {
                                     case MessageTypes.OpenAcctMsgType:
-                                        ProcessOpenAccount(msg);
+                                        ProcessOpenAccount(msg, client);
                                         break;
                                     case MessageTypes.AccountDetailsMsgType:
-                                        ProcessAccountDetails(msg);
+                                        ProcessAccountDetails(msg, client);
                                         break;
                                     case MessageTypes.AccountListMsgType:
-                                        ProcessAccountList(msg);
+                                        ProcessAccountList(msg, client);
                                         break;
                                     case MessageTypes.ClientIdMsgType:
-                                        ProcessAccountId(msg);
+                                        ProcessAccountId(msg, client);
                                         break;
                                     case MessageTypes.TxMsgType:
-                                        ProcessTransaction(msg);
+                                        ProcessTransaction(msg, client);
                                         break;
                                     default:
-                                        System.Diagnostics.Debug.WriteLine("Received unsupported msg type: {0}", msg.id);
+                                        System.Diagnostics.Debug.WriteLine("Received unsupported msg type: {0} from client: {1}", msg.id, client.ClientHandle);
                                         break;
                                 }
                             }
@@ -90,12 +90,12 @@ namespace MethodSelectorConsole
             }
         }
 
-        private void ProcessTransaction(MessageData data)
+        private void ProcessTransaction(MessageData data, Client client)
         {
             System.Diagnostics.Debug.WriteLine("Processing Transaction message");
             if (data.id != MessageTypes.TxMsgType)
             {
-                throw new BankingException("Invalid Transaction Type: " + data.id);
+                throw new BankingException("Invalid Transaction Type: " + data.id + " from Client: " + client.ClientHandle);
             }
             Transaction tx = data.message as Transaction;
             if (tx != null)
@@ -108,31 +108,48 @@ namespace MethodSelectorConsole
                         {
                             id = BankControlForm.Bank.GetNewAcctId();
                         }
-                        _bank.PerformAction(id, tx.acctLastName, tx.txOperation, tx.txAmount, tx.acctType, true);
+                        float balance = _bank.PerformAction(id, tx.acctLastName, tx.txOperation, tx.txAmount, tx.acctType, true);
+                        if (balance >= 0)
+                        {
+                            // Send response of Tx back to client
+                            TxDataGetter getter = new TxDataGetter();
+                            Transaction txBack = new Transaction();
+                            txBack.acctFirstName = tx.acctFirstName;
+                            txBack.acctLastName = tx.acctLastName;
+                            txBack.txAmount = (float)Convert.ToDouble(tx.txAmount);
+                            txBack.acctId = Convert.ToInt32(id);
+                            txBack.txOperation = "open-response";
+
+                            getter.TransactionDetails = txBack;
+
+                            // The data should send across in the library sender class
+                            client.SetData(txBack);
+
+                        }
                         break;
                     default:
-                        throw new BankingException("Invalid Transaction Name: " + data.name);
+                        throw new BankingException("Invalid Transaction Name: " + data.name + " from Client: " + client.ClientHandle);
                         break;
                 }
             }
         }
 
-        private void ProcessAccountId(MessageData data)
+        private void ProcessAccountId(MessageData data, Client client)
         {
             System.Diagnostics.Debug.WriteLine("Processing Account ID message");
         }
 
-        private void ProcessAccountList(MessageData data)
+        private void ProcessAccountList(MessageData data, Client client)
         {
             System.Diagnostics.Debug.WriteLine("Processing Account List message");
         }
 
-        private void ProcessAccountDetails(MessageData data)
+        private void ProcessAccountDetails(MessageData data, Client client)
         {
             System.Diagnostics.Debug.WriteLine("Processing Account Details message");
         }
 
-        private void ProcessOpenAccount(MessageData data)
+        private void ProcessOpenAccount(MessageData data, Client client)
         {
             System.Diagnostics.Debug.WriteLine("Processing Open Account message");
         }

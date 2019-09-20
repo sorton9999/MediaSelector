@@ -180,51 +180,65 @@ namespace MethodSelectorConsole
             set { details = value; }
         }
 
+        public Transaction TransactionDetails
+        {
+            get;
+            set;
+        }
+
         public MessageData GetData()
         {
             MessageData data = new MessageData();
-            if (details != null)
+            if (TransactionDetails != null)
             {
                 Transaction tx = new Transaction();
-                tx.acctFirstName = String.Empty;
-                tx.acctId = Convert.ToInt32(details.accountId);
-                tx.acctLastName = details.accountName;
-                tx.acctType = details.accountType;
-                tx.balance = details.accountBalance;
-                tx.txAmount = 0;
-                tx.txOperation = "tx";
+                tx.acctFirstName = TransactionDetails.acctFirstName;
+                tx.acctId = TransactionDetails.acctId;
+                tx.acctLastName = TransactionDetails.acctLastName;
+                tx.acctType = TransactionDetails.acctType;
+                tx.balance = TransactionDetails.balance;
+                tx.txAmount = TransactionDetails.txAmount;
+                tx.txOperation = TransactionDetails.txOperation;
+
+                data.message = tx;
             }
             data.id = MsgType;
             data.name = "tx";
+            // To prevent data ringing
+            TransactionDetails = null;
             return data;
         }
 
         public MessageData GetData(long handle)
         {
             MessageData data = new MessageData();
-            if (details != null)
+            if (TransactionDetails != null)
             {
                 Transaction tx = new Transaction();
-                tx.acctFirstName = String.Empty;
-                tx.acctId = Convert.ToInt32(details.accountId);
-                tx.acctLastName = details.accountName;
-                tx.acctType = details.accountType;
-                tx.balance = details.accountBalance;
-                tx.txAmount = 0;
-                tx.txOperation = "tx";
+                tx.acctFirstName = TransactionDetails.acctFirstName;
+                tx.acctId = TransactionDetails.acctId;
+                tx.acctLastName = TransactionDetails.acctLastName;
+                tx.acctType = TransactionDetails.acctType;
+                tx.balance = TransactionDetails.balance;
+                tx.txAmount = TransactionDetails.txAmount;
+                tx.txOperation = TransactionDetails.txOperation;
+
+                data.message = tx;
             }
             data.handle = handle;
             data.id = MsgType;
             data.name = "tx";
+            // To prevent data ringing
+            TransactionDetails = null;
             return data;
         }
 
         public void SetData(object data)
         {
-            AccountDetailsModel det = data as AccountDetailsModel;
-            if (det != null)
+            Transaction tx = data as Transaction;
+            if (tx != null)
             {
-                details = det;
+                TransactionDetails = tx;
             }
         }
     }

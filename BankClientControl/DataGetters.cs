@@ -83,16 +83,9 @@ namespace BankClientControl
         public MessageData GetData()
         {
             MessageData data = new MessageData();
-            if (details != null)
+            if (TransactionDetails != null)
             {
                 Transaction tx = new Transaction();
-                //tx.acctFirstName = String.Empty;
-                //tx.acctId = Convert.ToInt32(details.accountId);
-                //tx.acctLastName = details.accountName;
-                //tx.acctType = details.accountType;
-                //tx.balance = details.accountBalance;
-                //tx.txAmount = 0;
-                //tx.txOperation = "tx";
                 tx.acctFirstName = TransactionDetails.acctFirstName;
                 tx.acctId = TransactionDetails.acctId;
                 tx.acctLastName = TransactionDetails.acctLastName;
@@ -104,6 +97,9 @@ namespace BankClientControl
                 data.message = tx;
             }
             data.id = MsgType;
+            data.name = "tx";
+            // To prevent data ringing
+            TransactionDetails = null;
             return data;
         }
 
@@ -125,6 +121,7 @@ namespace BankClientControl
             }
             data.handle = handle;
             data.id = MsgType;
+            data.name = "tx";
 
             // Prevent data ring
             TransactionDetails = null;
@@ -134,11 +131,6 @@ namespace BankClientControl
 
         public void SetData(object data)
         {
-            //AccountDetailsModel model = data as AccountDetailsModel;
-            //if (model != null)
-            //{
-            //    details = model;
-            //}
             Transaction tx = data as Transaction;
             if (tx != null)
             {

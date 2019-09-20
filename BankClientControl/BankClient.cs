@@ -24,6 +24,23 @@ namespace BankClientControl
             conn = new ClientConnectAsync();
             IsConnected = false;
             ClientConnectAsync.OnConnect += ClientConnectAsync_OnConnect;
+            ThreadedReceiver.DataReceived += ThreadedReceiver_DataReceived;
+        }
+
+        private void ThreadedReceiver_DataReceived(object sender, System.ComponentModel.AsyncCompletedEventArgs e)
+        {
+            if (e.Error == null)
+            {
+                ReceiveData data = e.UserState as ReceiveData;
+                if (data != null)
+                {
+                    MessageData msg = data.clientData as MessageData;
+                    if (msg != null)
+                    {
+                        Console.WriteLine("<<< Received Msg from Server >>>");
+                    }
+                }
+            }
         }
 
         public BankClient(AddressFamily addressFamily, SocketType socketType, ProtocolType protoType)
