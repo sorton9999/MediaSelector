@@ -16,7 +16,7 @@ namespace BankClientWindow
         private void Application_Startup(object sender, StartupEventArgs e)
         {
             string ip = String.Empty;
-            int port = 0;
+            int port = CliServLib.CliServDefaults.DfltPort;
             int cycles = 20;
             int delayMs = 5000;
             for (int i = 0; i < e.Args.Length; ++i)

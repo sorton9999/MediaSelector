@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 using MethodSelector;
 using CommonClasses;
+using System.Windows.Threading;
 
 namespace MethodSelectorConsole
 {
@@ -56,6 +57,12 @@ namespace MethodSelectorConsole
         {
             get { return savingsInterest; }
             private set { savingsInterest = value; }
+        }
+
+        public Dispatcher Dispatcher
+        {
+            get;
+            set;
         }
 
         #endregion
@@ -237,8 +244,15 @@ namespace MethodSelectorConsole
                 try
                 {
                     accounts.Add(id, account);
-                    //accountDetails.AccountDetailsList.Add(account.AccountDetails);
-                    AccountDetailsListViewModel.addAction.Invoke(account.AccountDetails);
+
+                    if (!Dispatcher.CheckAccess())
+                    {
+                        Dispatcher.Invoke(AccountDetailsListViewModel.addAction, account.AccountDetails);
+                    }
+                    else
+                    {
+                        AccountDetailsListViewModel.addAction.Invoke(account.AccountDetails);
+                    }
                 }
                 catch (Exception e)
                 {

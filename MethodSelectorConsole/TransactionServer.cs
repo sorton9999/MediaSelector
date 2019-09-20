@@ -8,6 +8,7 @@ using CliServLib;
 using TcpLib;
 using CommonClasses;
 using MethodSelector;
+using System.Windows.Threading;
 
 namespace MethodSelectorConsole
 {
@@ -24,9 +25,10 @@ namespace MethodSelectorConsole
 
         bool done = false;
 
-        public TransactionServer(Bank bank)
+        public TransactionServer(Bank bank, Dispatcher dispatcher)
         {
             _bank = bank;
+            _bank.Dispatcher = dispatcher;
             //msgAction = ReceiveData;
             clients = new ClientStore();
             ClientConnectAsync.OnConnect += ClientConnectAsync_OnConnect;

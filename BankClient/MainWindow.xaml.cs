@@ -31,7 +31,7 @@ namespace BankClientWindow
             _port = port;
             client = new BankClientControl.BankClient();
             bankControl.BankClient = client;
-            bool ret = client.Connect(ip, 7001, delayMs, cycles);
+            bool ret = client.Connect(_ip, _port, delayMs, cycles);
             if (ret)
             {
                 client.TcpClient().Start();
