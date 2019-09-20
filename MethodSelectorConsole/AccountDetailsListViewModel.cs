@@ -12,9 +12,10 @@ namespace MethodSelectorConsole
     public class AccountDetailsListViewModel : ViewModelBase
     {
         private ObservableCollection<AccountDetailsViewModel> accountDetailsList;
-        //public AsyncObservableCollection<AccountDetailsViewModel> AccountDetailsList;
+
         private readonly object _collectionLock = new object();
 
+        // Called by GUI thread dispatcher
         public static Action<AccountDetailsViewModel> addAction;
 
         public AccountDetailsListViewModel()

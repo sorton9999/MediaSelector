@@ -33,7 +33,7 @@ namespace MethodSelectorConsole
             errorTextBox.DataContext = Vm;
             acctTypeComboBox.ItemsSource = Account.LoadAccountTypes();
 
-            _server = new TransactionServer(BankControlForm.Bank);
+            _server = new TransactionServer(BankControlForm.Bank, this.Dispatcher);
         }
 
         private void OpenButton_Click(object sender, RoutedEventArgs e)
