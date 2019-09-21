@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using CliServLib;
 using TcpLib;
 using System.Net.Sockets;
+using System.Windows.Threading;
 
 namespace BankClientControl
 {
@@ -38,6 +39,14 @@ namespace BankClientControl
                     if (msg != null)
                     {
                         Console.WriteLine("<<< Received Msg from Server >>>");
+                        if (!Dispatcher.CheckAccess())
+                        {
+                            Dispatcher.Invoke(BankClientControl.dataAction, msg);
+                        }
+                        else
+                        {
+                            BankClientControl.dataAction.Invoke(msg);
+                        }
                     }
                 }
             }
@@ -72,6 +81,12 @@ namespace BankClientControl
         {
             get { return _port; }
             private set { _port = value; }
+        }
+
+        public Dispatcher Dispatcher
+        {
+            get;
+            set;
         }
 
         public Client TcpClient()

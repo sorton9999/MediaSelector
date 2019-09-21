@@ -16,8 +16,8 @@
                 </GridView>
             </ListView.View>
         </ListView>
-        <Button x:Name="withdrawButton" Content="Withdraw" HorizontalAlignment="Left" Margin="39,273,0,0" VerticalAlignment="Top" Width="75" Height="46"/>
-        <Button x:Name="depositButton" Content="Deposit" HorizontalAlignment="Left" Margin="162,273,0,0" VerticalAlignment="Top" Width="75" Height="46"/>
+        <Button x:Name="withdrawButton" Content="Withdraw" HorizontalAlignment="Left" Margin="39,273,0,0" VerticalAlignment="Top" Width="75" Height="46" Click="WithdrawBtn_Click"/>
+        <Button x:Name="depositButton" Content="Deposit" HorizontalAlignment="Left" Margin="162,273,0,0" VerticalAlignment="Top" Width="75" Height="46" Click="DepositBtn_Click"/>
         <Button x:Name="openAcctButton" Content="Open Acct" HorizontalAlignment="Left" Margin="286,273,0,0" VerticalAlignment="Top" Width="75" Height="46" Click="OpenAcctBtn_Click"/>
         <TextBlock x:Name="textBlock" Text="{Binding Path=StrOut}" HorizontalAlignment="Left" Margin="10,324,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="389" Height="66" Foreground="#FFF50C0C"/>
         <StackPanel x:Name="DetailsStack" HorizontalAlignment="Left" Height="174" Margin="404,10,0,0" VerticalAlignment="Top" Width="236">

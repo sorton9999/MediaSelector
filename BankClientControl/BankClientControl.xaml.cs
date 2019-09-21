@@ -30,6 +30,8 @@ namespace BankClientControl
             DependencyProperty.Register(
             "BankClient", typeof(BankClient), typeof(BankClientControl), null);
 
+        public static Action<MessageData> dataAction;
+
         public BankClientControl()
         {
             InitializeComponent();
@@ -50,6 +52,8 @@ namespace BankClientControl
 
             DetailsStack.DataContext = Vm;
             listView.ItemsSource = acctList;
+
+            dataAction = new Action<MessageData>(AddData);
         }
 
         public BankClient BankClient
@@ -62,6 +66,85 @@ namespace BankClientControl
         {
             get { return Vm.StrOut; }
             set { Vm.StrOut = value; }
+        }
+
+        private void AddData(MessageData data)
+        { 
+            System.Diagnostics.Debug.WriteLine("Processing Message Type: {0}", data.id);
+            if ((data == null) || (data.id <= 0) || (data.message == null))
+            {
+                return;
+            }
+            switch (data.id)
+            {
+                case MessageTypes.AccountDetailsMsgType:
+                    break;
+                case MessageTypes.AccountListMsgType:
+                    break;
+                case MessageTypes.ClientIdMsgType:
+                    break;
+                case MessageTypes.OpenAcctMsgType:
+                    break;
+                case MessageTypes.TxMsgType:
+                    {
+                        Transaction tx = data.message as Transaction;
+                        if (tx != null)
+                        {
+                            switch (tx.txOperation)
+                            {
+                                case "open-response":
+                                    {
+                                        AccountDetailsViewModel details = new AccountDetailsViewModel();
+                                        details.AccountId = tx.acctId.ToString();
+                                        details.AccountName = tx.acctLastName;
+                                        details.Balance = tx.balance;
+
+                                        // Below needs to change
+                                        details.Type = AccountType.INTEREST_CHECKING;
+
+                                        acctList.Add(details);
+                                    }
+                                    break;
+                                case "deposit-response":
+                                    {
+                                        AccountDetailsViewModel details = FindAccount(tx.acctId.ToString());
+                                        if (details != default(AccountDetailsViewModel))
+                                        {
+                                            details.Balance = tx.balance;
+                                        }
+                                    }
+                                    break;
+                                case "withdraw-response":
+                                    {
+                                        AccountDetailsViewModel details = FindAccount(tx.acctId.ToString());
+                                        if (details != default(AccountDetailsViewModel))
+                                        {
+                                            details.Balance = tx.balance;
+                                        }
+                                    }
+                                    break;
+                                default:
+                                    System.Diagnostics.Debug.WriteLine("Unsupported Transaction Type: {0}", tx.txOperation);
+                                    break;
+                            }
+                        }
+                    }
+                    break;
+                default:
+                    System.Diagnostics.Debug.WriteLine("Unsupported Msg Type {0}", data.id);
+                    break;
+            }
+        }
+
+        private AccountDetailsViewModel FindAccount(string acctId)
+        {
+            AccountDetailsViewModel details = default(AccountDetailsViewModel);
+            var item = acctList.ToLookup((s) => s.AccountId = acctId);
+            foreach (var i in item[acctId])
+            {
+                details = i;
+            }
+            return details;
         }
 
         private void ListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -83,12 +166,13 @@ namespace BankClientControl
             string first = firstNameTextBox.Text;
             string last = lastNameTextBox.Text;
             string deposit = depositTextBox.Text;
-            //OpenAcctDataGetter getter = new OpenAcctDataGetter(first, last, deposit);
-            TxDataGetter getter = new TxDataGetter();
-            //AccountDetailsModel details = new AccountDetailsModel();
-            //details.accountBalance = (float)Convert.ToDouble(deposit);
-            //details.accountName = first;
-            //getter.AccountDetails = details;
+
+            // We need this dispatcher to update the ObserverCollection from the BankClient.
+            // The transactions are off the main thread.
+            if (BankClient.Dispatcher == null)
+            {
+                BankClient.Dispatcher = this.Dispatcher;
+            }
 
             Transaction tx = new Transaction();
             tx.acctFirstName = first;
@@ -96,33 +180,44 @@ namespace BankClientControl
             tx.txAmount = (float)Convert.ToDouble(deposit);
             tx.txOperation = "open";
 
-            getter.TransactionDetails = tx;
-
             // The data should send across in the library sender class
             BankClient.TcpClient().SetData(tx);
+        }
 
-            /*
-            var eventData = GetDataAsync.GetMessageDataAsync(getter, MessageTypes.OpenAcctMsgType);
-            if (eventData != null)
+        private void WithdrawBtn_Click(object sender, RoutedEventArgs e)
+        {
+            int idx = listView.SelectedIndex;
+            if (idx >= 0)
             {
-                try
-                {
-                    eventData.Result.name = "openacct";
+                AccountDetailsViewModel details = acctList[idx];
+                Transaction tx = new Transaction();
+                tx.acctLastName = details.AccountName;
+                tx.acctId = Convert.ToInt32(details.AccountId);
+                tx.acctType = details.Type;
+                tx.balance = details.Balance;
+                tx.txAmount = (float)Convert.ToDouble(depositTextBox.Text);
+                tx.txOperation = "withdraw";
 
-                    var sendResult = SendMessageAsync.SendMsgAsync(BankClient.ClientSocket, eventData.Result);
-
-                    if (sendResult.Result.Failure)
-                    {
-                        System.Diagnostics.Debug.WriteLine("There was a problem sending acct message to the server.");
-                    }
-                }
-                catch (Exception ex)
-                {
-                    System.Diagnostics.Debug.WriteLine("Send Exception: " + ex.Message);
-                }
+                BankClient.TcpClient().SetData(tx);
             }
-            */
+        }
 
+        private void DepositBtn_Click(object sender, RoutedEventArgs e)
+        {
+            int idx = listView.SelectedIndex;
+            if (idx >= 0)
+            {
+                AccountDetailsViewModel details = acctList[idx];
+                Transaction tx = new Transaction();
+                tx.acctLastName = details.AccountName;
+                tx.acctId = Convert.ToInt32(details.AccountId);
+                tx.acctType = details.Type;
+                tx.balance = details.Balance;
+                tx.txAmount = (float)Convert.ToDouble(depositTextBox.Text);
+                tx.txOperation = "deposit";
+
+                BankClient.TcpClient().SetData(tx);
+            }
         }
     }
 }

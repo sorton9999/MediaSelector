@@ -167,17 +167,10 @@ namespace MethodSelectorConsole
 
     public class TxDataGetter : IDataGetter
     {
-        AccountDetailsModel details;
         const int MsgType = MessageTypes.TxMsgType;
 
         public TxDataGetter()
         {
-        }
-
-        public AccountDetailsModel AccountDetails
-        {
-            get { return details; }
-            set { details = value; }
         }
 
         public Transaction TransactionDetails

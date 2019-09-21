@@ -103,28 +103,85 @@ namespace MethodSelectorConsole
                 switch (tx.txOperation)
                 {
                     case "open":
-                        string id = tx.acctId.ToString();
-                        if (String.IsNullOrEmpty(id) || (String.Compare(id, "0") == 0))
                         {
-                            id = BankControlForm.Bank.GetNewAcctId();
+                            string id = tx.acctId.ToString();
+                            if (String.IsNullOrEmpty(id) || (String.Compare(id, "0") == 0))
+                            {
+                                id = BankControlForm.Bank.GetNewAcctId();
+                            }
+                            try
+                            {
+                                float balance = _bank.PerformAction(id, tx.acctLastName, tx.txOperation, tx.txAmount, tx.acctType, true);
+                                if (balance >= 0)
+                                {
+                                    // Send response of Tx back to client
+                                    Transaction txBack = new Transaction();
+                                    txBack.acctFirstName = tx.acctFirstName;
+                                    txBack.acctLastName = tx.acctLastName;
+                                    txBack.txAmount = (float)Convert.ToDouble(tx.txAmount);
+                                    txBack.acctId = Convert.ToInt32(id);
+                                    txBack.txOperation = "open-response";
+                                    txBack.balance = balance;
+
+                                    // The data should send across in the library sender class
+                                    client.SetData(txBack);
+
+                                }
+                            }
+                            catch (Exception e)
+                            {
+                                System.Diagnostics.Debug.WriteLine("Open Tx Exception: " + e.Message);
+                            }
                         }
-                        float balance = _bank.PerformAction(id, tx.acctLastName, tx.txOperation, tx.txAmount, tx.acctType, true);
-                        if (balance >= 0)
+                        break;
+                    case "deposit":
                         {
-                            // Send response of Tx back to client
-                            TxDataGetter getter = new TxDataGetter();
-                            Transaction txBack = new Transaction();
-                            txBack.acctFirstName = tx.acctFirstName;
-                            txBack.acctLastName = tx.acctLastName;
-                            txBack.txAmount = (float)Convert.ToDouble(tx.txAmount);
-                            txBack.acctId = Convert.ToInt32(id);
-                            txBack.txOperation = "open-response";
+                            try
+                            {
+                                float balance = _bank.PerformAction(tx.acctId.ToString(), tx.acctLastName, tx.txOperation, tx.txAmount, tx.acctType);
+                                if (balance >= 0)
+                                {
+                                    Transaction txBack = new Transaction();
+                                    txBack.acctFirstName = tx.acctFirstName;
+                                    txBack.acctId = tx.acctId;
+                                    txBack.acctLastName = tx.acctLastName;
+                                    txBack.acctType = tx.acctType;
+                                    txBack.balance = balance;
+                                    txBack.txAmount = tx.txAmount;
+                                    txBack.txOperation = "deposit-response";
 
-                            getter.TransactionDetails = txBack;
+                                    client.SetData(txBack);
+                                }
+                            }
+                            catch (Exception e)
+                            {
+                                System.Diagnostics.Debug.WriteLine("Deposit Tx Exception: " + e.Message);
+                            }
+                        }
+                        break;
+                    case "withdraw":
+                        {
+                            try
+                            {
+                                float balance = _bank.PerformAction(tx.acctId.ToString(), tx.acctLastName, tx.txOperation, tx.txAmount, tx.acctType);
+                                if (balance >= 0)
+                                {
+                                    Transaction txBack = new Transaction();
+                                    txBack.acctFirstName = tx.acctFirstName;
+                                    txBack.acctId = tx.acctId;
+                                    txBack.acctLastName = tx.acctLastName;
+                                    txBack.acctType = tx.acctType;
+                                    txBack.balance = balance;
+                                    txBack.txAmount = tx.txAmount;
+                                    txBack.txOperation = "withdraw-response";
 
-                            // The data should send across in the library sender class
-                            client.SetData(txBack);
-
+                                    client.SetData(txBack);
+                                }
+                            }
+                            catch (Exception e)
+                            {
+                                System.Diagnostics.Debug.WriteLine("Withdraw Tx Exception: " + e.Message);
+                            }
                         }
                         break;
                     default:
@@ -184,15 +241,8 @@ namespace MethodSelectorConsole
             }
         }
 
-        public void SendTransaction(AccountDetailsViewModel details)
+        public void SendTransaction(Transaction details)
         {
-            AccountDetailsModel model = new AccountDetailsModel();
-            model.accountBalance = details.Balance;
-            model.accountId = details.AccountId;
-            model.accountName = details.AccountName;
-            model.accountType = details.Type;
-            model.addBtn = details.AddBtn;
-            tx.AccountDetails = model;
         }
 
         public static void ClientReceiveTransaction(object sender, AsyncCompletedEventArgs e)
