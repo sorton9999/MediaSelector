@@ -25,10 +25,9 @@ namespace BankClientControl
             conn = new ClientConnectAsync();
             IsConnected = false;
             ClientConnectAsync.OnConnect += ClientConnectAsync_OnConnect;
-            ThreadedReceiver.DataReceived += ThreadedReceiver_DataReceived;
         }
 
-        private void ThreadedReceiver_DataReceived(object sender, System.ComponentModel.AsyncCompletedEventArgs e)
+        private void Receiver_ClientDataReceived(object sender, System.ComponentModel.AsyncCompletedEventArgs e)
         {
             if (e.Error == null)
             {
@@ -38,7 +37,7 @@ namespace BankClientControl
                     MessageData msg = data.clientData as MessageData;
                     if (msg != null)
                     {
-                        Console.WriteLine("<<< Received Msg from Server >>>");
+                        Console.WriteLine("<<< Client: {0} -- Received Msg from Server >>>", msg.handle);
                         if (!Dispatcher.CheckAccess())
                         {
                             Dispatcher.Invoke(BankClientControl.dataAction, msg);
@@ -105,7 +104,8 @@ namespace BankClientControl
             }
             _clientSocket = connectResult.Result.Value;
             tcpClient = new Client(_clientSocket, 1024, dataGetter);
-            
+            tcpClient.Receiver.ClientDataReceived += Receiver_ClientDataReceived;
+
             return _clientSocket.Connected;
         }
 

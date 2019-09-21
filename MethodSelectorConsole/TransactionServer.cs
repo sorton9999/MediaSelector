@@ -32,12 +32,12 @@ namespace MethodSelectorConsole
             //msgAction = ReceiveData;
             clients = new ClientStore();
             ClientConnectAsync.OnConnect += ClientConnectAsync_OnConnect;
-            ThreadedReceiver.DataReceived += ThreadedReceiver_DataReceived;
+            ThreadedReceiver.ServerDataReceived += ThreadedReceiver_ServerDataReceived;
             listenerThread = new ThreadedListener(tx);
             listenerThread.Run(clients);
         }
 
-        private void ThreadedReceiver_DataReceived(object sender, AsyncCompletedEventArgs e)
+        private void ThreadedReceiver_ServerDataReceived(object sender, AsyncCompletedEventArgs e)
         {
             if (e.Error == null)
             {
@@ -92,7 +92,7 @@ namespace MethodSelectorConsole
 
         private void ProcessTransaction(MessageData data, Client client)
         {
-            System.Diagnostics.Debug.WriteLine("Processing Transaction message");
+            System.Diagnostics.Debug.WriteLine("Processing Transaction message for client {0}", client.ClientHandle);
             if (data.id != MessageTypes.TxMsgType)
             {
                 throw new BankingException("Invalid Transaction Type: " + data.id + " from Client: " + client.ClientHandle);
@@ -122,6 +122,7 @@ namespace MethodSelectorConsole
                                     txBack.acctId = Convert.ToInt32(id);
                                     txBack.txOperation = "open-response";
                                     txBack.balance = balance;
+                                    txBack.response = true;
 
                                     // The data should send across in the library sender class
                                     client.SetData(txBack);
@@ -149,6 +150,7 @@ namespace MethodSelectorConsole
                                     txBack.balance = balance;
                                     txBack.txAmount = tx.txAmount;
                                     txBack.txOperation = "deposit-response";
+                                    txBack.response = true;
 
                                     client.SetData(txBack);
                                 }
@@ -174,6 +176,7 @@ namespace MethodSelectorConsole
                                     txBack.balance = balance;
                                     txBack.txAmount = tx.txAmount;
                                     txBack.txOperation = "withdraw-response";
+                                    txBack.response = true;
 
                                     client.SetData(txBack);
                                 }

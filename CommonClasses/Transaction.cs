@@ -9,12 +9,13 @@ namespace CommonClasses
     [Serializable]
     public class Transaction
     {
-        public int acctId;
-        public string acctFirstName;
-        public string acctLastName;
-        public string txOperation;
-        public CommonClasses.AccountType acctType;
-        public float txAmount;
-        public float balance;
+        public int acctId = 0;
+        public string acctFirstName = String.Empty;
+        public string acctLastName = String.Empty;
+        public string txOperation = String.Empty;
+        public CommonClasses.AccountType acctType = AccountType.UNINIT;
+        public float txAmount = 0F;
+        public float balance = 0F;
+        public bool response = false;
     }
 }

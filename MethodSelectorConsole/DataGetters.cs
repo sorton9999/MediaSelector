@@ -194,6 +194,10 @@ namespace MethodSelectorConsole
                 tx.txOperation = TransactionDetails.txOperation;
 
                 data.message = tx;
+                if (tx.txOperation.Contains("response"))
+                {
+                    data.response = true;
+                }
             }
             data.id = MsgType;
             data.name = "tx";
@@ -217,6 +221,10 @@ namespace MethodSelectorConsole
                 tx.txOperation = TransactionDetails.txOperation;
 
                 data.message = tx;
+                if (tx.txOperation.Contains("response"))
+                {
+                    data.response = true;
+                }
             }
             data.handle = handle;
             data.id = MsgType;
