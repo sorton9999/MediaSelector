@@ -19,6 +19,12 @@ namespace MethodSelectorConsole
             InitializeComponent();
             bankControl1.Vm.ActiveAccountName = name;
             bankControl1.acctListView.ItemsSource = _bank.AccountDetailsList.AccountDetailsList;
+            this.FormClosing += BankControlForm_FormClosing;
+        }
+
+        private void BankControlForm_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            bankControl1.CloseWindow();
         }
 
         public static Bank Bank

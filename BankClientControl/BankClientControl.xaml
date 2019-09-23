@@ -41,9 +41,11 @@
         </StackPanel>
         <Label x:Name="label8" Content="First Name" HorizontalAlignment="Left" Margin="10,205,0,0" VerticalAlignment="Top" Width="70"/>
         <TextBox x:Name="firstNameTextBox" HorizontalAlignment="Left" Height="23" Margin="85,208,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
-        <Label x:Name="label9" Content="Last Name" HorizontalAlignment="Left" Margin="233,205,0,0" VerticalAlignment="Top" Width="75"/>
-        <TextBox x:Name="lastNameTextBox" HorizontalAlignment="Left" Height="23" Margin="325,208,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
-        <Label x:Name="label10" Content="Initial Deposit" HorizontalAlignment="Left" Margin="214,233,0,0" VerticalAlignment="Top" Width="94"/>
-        <TextBox x:Name="depositTextBox" HorizontalAlignment="Left" Height="23" Margin="325,236,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
+        <Label x:Name="label9" Content="Last Name" HorizontalAlignment="Left" Margin="252,205,0,0" VerticalAlignment="Top" Width="75"/>
+        <TextBox x:Name="lastNameTextBox" HorizontalAlignment="Left" Height="23" Margin="337,208,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
+        <Label x:Name="label10" Content="Initial Deposit" HorizontalAlignment="Left" Margin="233,233,0,0" VerticalAlignment="Top" Width="94"/>
+        <TextBox x:Name="depositTextBox" HorizontalAlignment="Left" Height="23" Margin="337,236,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
+        <Label x:Name="label11" Content="Acct Type:" HorizontalAlignment="Left" Margin="10,236,0,0" VerticalAlignment="Top" Width="70"/>
+        <ComboBox x:Name="acctTypeCB" HorizontalAlignment="Left" Margin="85,237,0,0" VerticalAlignment="Top" Width="120"/>
     </Grid>
 </UserControl>

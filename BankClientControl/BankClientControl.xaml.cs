@@ -52,6 +52,7 @@ namespace BankClientControl
 
             DetailsStack.DataContext = Vm;
             listView.ItemsSource = acctList;
+            acctTypeCB.ItemsSource = AccountDetailsClass.LoadAccountTypes();
 
             dataAction = new Action<MessageData>(AddData);
         }
@@ -98,9 +99,7 @@ namespace BankClientControl
                                         details.AccountId = tx.acctId.ToString();
                                         details.AccountName = tx.acctLastName;
                                         details.Balance = tx.balance;
-
-                                        // Below needs to change
-                                        details.Type = AccountType.INTEREST_CHECKING;
+                                        details.Type = tx.acctType;
 
                                         acctList.Add(details);
                                     }
@@ -139,8 +138,8 @@ namespace BankClientControl
         private AccountDetailsViewModel FindAccount(string acctId)
         {
             AccountDetailsViewModel details = default(AccountDetailsViewModel);
-            var item = acctList.ToLookup((s) => s.AccountId = acctId);
-            foreach (var i in item[acctId])
+            var item = acctList.ToLookup( s => s.AccountId == acctId );
+            foreach (var i in item[true])
             {
                 details = i;
             }
@@ -178,6 +177,7 @@ namespace BankClientControl
             tx.acctFirstName = first;
             tx.acctLastName = last;
             tx.txAmount = (float)Convert.ToDouble(deposit);
+            tx.acctType = AccountDetailsClass.AccountTypeFromInt(acctTypeCB.SelectedIndex);
             tx.txOperation = "open";
 
             // The data should send across in the library sender class

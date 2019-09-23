@@ -120,6 +120,7 @@ namespace MethodSelectorConsole
                                     txBack.acctLastName = tx.acctLastName;
                                     txBack.txAmount = (float)Convert.ToDouble(tx.txAmount);
                                     txBack.acctId = Convert.ToInt32(id);
+                                    txBack.acctType = tx.acctType;
                                     txBack.txOperation = "open-response";
                                     txBack.balance = balance;
                                     txBack.response = true;
@@ -242,6 +243,12 @@ namespace MethodSelectorConsole
                     listenerThread.StopLoopAction.Invoke();
                 }
             }
+        }
+
+        public void CleanUp()
+        {
+            RemoveAllClients();
+            listenerThread.StopLoopAction();
         }
 
         public void SendTransaction(Transaction details)

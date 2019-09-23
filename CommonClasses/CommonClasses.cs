@@ -34,6 +34,23 @@ namespace CommonClasses
             get { return accountDetailsList; }
             set { accountDetailsList = value; }
         }
+
+        public static string[] LoadAccountTypes()
+        {
+            string[] items = Enum.GetNames(typeof(AccountType));
+            return items;
+        }
+
+        public static AccountType AccountTypeFromInt(int value)
+        {
+            AccountType ret = AccountType.UNINIT;
+            bool ans = Enum.TryParse(value.ToString(), out ret);
+            if (!ans)
+            {
+                ret = AccountType.OTHER;
+            }
+            return ret;
+        }
     }
 
     public static class MessageTypes

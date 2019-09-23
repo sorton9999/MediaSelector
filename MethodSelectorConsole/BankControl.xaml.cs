@@ -31,7 +31,7 @@ namespace MethodSelectorConsole
             InitializeComponent();
             acctTextBox.DataContext = Vm;
             errorTextBox.DataContext = Vm;
-            acctTypeComboBox.ItemsSource = Account.LoadAccountTypes();
+            acctTypeComboBox.ItemsSource = CommonClasses.AccountDetailsClass.LoadAccountTypes(); //Account.LoadAccountTypes();
 
             _server = new TransactionServer(BankControlForm.Bank, this.Dispatcher);
         }
@@ -177,6 +177,11 @@ namespace MethodSelectorConsole
                 Console.WriteLine(ex.Message);
                 Vm.ErrorString = ex.Message;
             }
+        }
+
+        public void CloseWindow()
+        {
+            _server.CleanUp();
         }
     }
 
