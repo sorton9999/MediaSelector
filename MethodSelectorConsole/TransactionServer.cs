@@ -15,13 +15,11 @@ namespace MethodSelectorConsole
     public class TransactionServer
     {
         Bank _bank;
-
-        public static event AsyncCompletedEventHandler TransactionReceived;
-
         ClientStore clients;
         TxDataGetter tx = new TxDataGetter();
-        //Action<MessageData> msgAction;
         ThreadedListener listenerThread;
+        private const int MaxEmptyRcv = 100;
+        private int currentNumEmptyRcv = 0;
 
         bool done = false;
 
@@ -29,9 +27,7 @@ namespace MethodSelectorConsole
         {
             _bank = bank;
             _bank.Dispatcher = dispatcher;
-            //msgAction = ReceiveData;
             clients = new ClientStore();
-            ClientConnectAsync.OnConnect += ClientConnectAsync_OnConnect;
             ThreadedReceiver.ServerDataReceived += ThreadedReceiver_ServerDataReceived;
             listenerThread = new ThreadedListener(tx);
             listenerThread.Run(clients);
@@ -45,10 +41,10 @@ namespace MethodSelectorConsole
                 if (data != null)
                 {
                     MessageData msg = data.clientData;
+                    Client client = ClientStore.FindClient(data.clientHandle);
                     if ((msg != null) && (msg.id > 0))
                     {
                         System.Diagnostics.Debug.WriteLine("Received Message Type: {0}", msg.id);
-                        Client client = ClientStore.FindClient(data.clientHandle);
                         if (client != null)
                         {
                             System.Diagnostics.Debug.WriteLine("   From Client: {0}", data.clientHandle);
@@ -84,6 +80,14 @@ namespace MethodSelectorConsole
 
 
                             client.ClearData();
+                        }
+                    }
+                    else
+                    {
+                        ++currentNumEmptyRcv;
+                        if (currentNumEmptyRcv == MaxEmptyRcv)
+                        {
+                            client.Stop();
                         }
                     }
                 }
@@ -214,23 +218,6 @@ namespace MethodSelectorConsole
         {
             System.Diagnostics.Debug.WriteLine("Processing Open Account message");
         }
-
-        private void ClientConnectAsync_OnConnect(System.Net.Sockets.Socket socket)
-        {
-            ListDataGetter getter = new ListDataGetter(_bank);
-            var message = GetDataAsync.GetMessageDataAsync(getter, CommonClasses.MessageTypes.AccountListMsgType);
-            var sendResult = SendMessageAsync.SendMsgAsync(socket, message);
-
-            if (sendResult.Result.Failure)
-            {
-                System.Diagnostics.Debug.WriteLine("Send Failure from Tx Server");
-            }
-        }
-
-        //public void ReceiveData(MessageData data)
-        //{
-        //    Console.WriteLine("<<<<< Received Message of Type: {0} >>>>>", data.id);
-        //}
 
         public bool ServerIsDone
         {

@@ -17,6 +17,8 @@ namespace BankClientControl
         Client tcpClient;
         TxDataGetter dataGetter = new TxDataGetter();
         Socket _clientSocket;
+        private const int MaxEmptyRcv = 100;
+        private int currentNumEmptyRcv = 0;
         string _ip = String.Empty;
         int _port = 0;
 
@@ -35,7 +37,7 @@ namespace BankClientControl
                 if (data != null)
                 {
                     MessageData msg = data.clientData as MessageData;
-                    if (msg != null)
+                    if ((msg != null) && (msg.id > 0))
                     {
                         Console.WriteLine("<<< Client: {0} -- Received Msg from Server >>>", msg.handle);
                         if (!Dispatcher.CheckAccess())
@@ -45,6 +47,15 @@ namespace BankClientControl
                         else
                         {
                             BankClientControl.dataAction.Invoke(msg);
+                        }
+                        currentNumEmptyRcv = 0;
+                    }
+                    else
+                    {
+                        ++currentNumEmptyRcv;
+                        if (currentNumEmptyRcv == MaxEmptyRcv)
+                        {
+                            Close();
                         }
                     }
                 }
