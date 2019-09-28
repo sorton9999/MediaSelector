@@ -216,7 +216,43 @@ namespace MethodSelectorConsole
 
         private void ProcessOpenAccount(MessageData data, Client client)
         {
-            System.Diagnostics.Debug.WriteLine("Processing Open Account message");
+            if (data.id != MessageTypes.OpenAcctMsgType)
+            {
+                throw new BankingException("Invalid Transaction Type: " + data.id + " from Client: " + client.ClientHandle);
+            }
+            Transaction tx = data.message as Transaction;
+            if (tx != null)
+            {
+                string id = tx.acctId.ToString();
+                if (String.IsNullOrEmpty(id) || (String.Compare(id, "0") == 0))
+                {
+                    id = BankControlForm.Bank.GetNewAcctId();
+                }
+                try
+                {
+                    float balance = _bank.PerformAction(id, tx.acctLastName, tx.txOperation, tx.txAmount, tx.acctType, true);
+                    if (balance >= 0)
+                    {
+                        // Send response of Tx back to client
+                        Transaction txBack = new Transaction();
+                        txBack.acctFirstName = tx.acctFirstName;
+                        txBack.acctLastName = tx.acctLastName;
+                        txBack.txAmount = (float)Convert.ToDouble(tx.txAmount);
+                        txBack.acctId = Convert.ToInt32(id);
+                        txBack.txOperation = "open-response";
+                        txBack.balance = balance;
+                        txBack.response = true;
+
+                        // The data should send across in the library sender class
+                        client.SetData(txBack);
+
+                    }
+                }
+                catch (Exception e)
+                {
+                    System.Diagnostics.Debug.WriteLine("Open Tx Exception: " + e.Message);
+                }
+            }
         }
 
         public bool ServerIsDone
