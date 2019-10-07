@@ -239,6 +239,7 @@ namespace MethodSelectorConsole
                         txBack.acctLastName = tx.acctLastName;
                         txBack.txAmount = (float)Convert.ToDouble(tx.txAmount);
                         txBack.acctId = Convert.ToInt32(id);
+                        txBack.acctType = tx.acctType;
                         txBack.txOperation = "open-response";
                         txBack.balance = balance;
                         txBack.response = true;

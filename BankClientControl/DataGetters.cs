@@ -32,15 +32,18 @@ namespace BankClientControl
         public MessageData GetData()
         {
             MessageData data = new MessageData();
-            Transaction tx = new Transaction();
-            tx.acctFirstName = acctData.firstName;
-            tx.acctLastName = acctData.lastName;
-            tx.txOperation = "open";
-            tx.txAmount = acctData.deposit;
-            tx.acctType = acctData.acctType;
-            data.name = "openacct";
-            data.message = tx;
-            data.id = MsgType;
+            if (acctData != null)
+            {
+                Transaction tx = new Transaction();
+                tx.acctFirstName = acctData.firstName;
+                tx.acctLastName = acctData.lastName;
+                tx.txOperation = "open";
+                tx.txAmount = acctData.deposit;
+                tx.acctType = acctData.acctType;
+                data.name = "openacct";
+                data.message = tx;
+                data.id = MsgType;
+            }
             // Prevent data ringing
             acctData = null;
             return data;
@@ -49,16 +52,19 @@ namespace BankClientControl
         public MessageData GetData(long handle)
         {
             MessageData data = new MessageData();
-            Transaction tx = new Transaction();
-            tx.acctFirstName = acctData.firstName;
-            tx.acctLastName = acctData.lastName;
-            tx.txOperation = "open";
-            tx.txAmount = acctData.deposit;
-            tx.acctType = acctData.acctType;
-            data.name = "openacct";
-            data.message = tx;
-            data.id = MsgType;
-            data.handle = handle;
+            if (acctData != null)
+            {
+                Transaction tx = new Transaction();
+                tx.acctFirstName = acctData.firstName;
+                tx.acctLastName = acctData.lastName;
+                tx.txOperation = "open";
+                tx.txAmount = acctData.deposit;
+                tx.acctType = acctData.acctType;
+                data.name = "openacct";
+                data.message = tx;
+                data.id = MsgType;
+                data.handle = handle;
+            }
             // Prevent data ringing
             acctData = null;
             return data;
@@ -69,7 +75,7 @@ namespace BankClientControl
             OpenAcctData tempData = data as OpenAcctData;
             if (tempData != null)
             {
-                data = tempData;
+                acctData = tempData;
             }
         }
 
