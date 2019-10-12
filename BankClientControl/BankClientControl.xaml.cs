@@ -198,6 +198,7 @@ namespace BankClientControl
             if (idx >= 0)
             {
                 AccountDetailsViewModel details = acctList[idx];
+                TxDataGetter getter = new TxDataGetter();
                 Transaction tx = new Transaction();
                 tx.acctLastName = details.AccountName;
                 tx.acctId = Convert.ToInt32(details.AccountId);
@@ -206,7 +207,7 @@ namespace BankClientControl
                 tx.txAmount = (float)Convert.ToDouble(depositTextBox.Text);
                 tx.txOperation = "withdraw";
 
-                BankClient.TcpClient().SetData(tx);
+                BankClient.TcpClient().SetData(tx, getter);
             }
         }
 
@@ -216,6 +217,7 @@ namespace BankClientControl
             if (idx >= 0)
             {
                 AccountDetailsViewModel details = acctList[idx];
+                TxDataGetter getter = new TxDataGetter();
                 Transaction tx = new Transaction();
                 tx.acctLastName = details.AccountName;
                 tx.acctId = Convert.ToInt32(details.AccountId);
@@ -224,7 +226,7 @@ namespace BankClientControl
                 tx.txAmount = (float)Convert.ToDouble(depositTextBox.Text);
                 tx.txOperation = "deposit";
 
-                BankClient.TcpClient().SetData(tx);
+                BankClient.TcpClient().SetData(tx, getter);
             }
         }
     }
