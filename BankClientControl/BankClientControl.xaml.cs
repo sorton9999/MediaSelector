@@ -173,15 +173,23 @@ namespace BankClientControl
                 BankClient.Dispatcher = this.Dispatcher;
             }
 
-            Transaction tx = new Transaction();
-            tx.acctFirstName = first;
-            tx.acctLastName = last;
-            tx.txAmount = (float)Convert.ToDouble(deposit);
-            tx.acctType = AccountDetailsClass.AccountTypeFromInt(acctTypeCB.SelectedIndex);
-            tx.txOperation = "open";
+            OpenAcctDataGetter getter = new OpenAcctDataGetter();
+            OpenAcctDataGetter.OpenAcctData data = new OpenAcctDataGetter.OpenAcctData();
+            AccountType typeVal = AccountType.UNINIT;
+            if (!Enum.TryParse(acctTypeCB.SelectedIndex.ToString(), out typeVal))
+            {
+                typeVal = AccountType.OTHER;
+            }
+            data.acctType = typeVal;
+            data.deposit = (float)Convert.ToDouble(deposit);
+            data.firstName = first;
+            data.lastName = last;
+
+            getter.SetData(data);
+
 
             // The data should send across in the library sender class
-            BankClient.TcpClient().SetData(tx);
+            BankClient.TcpClient().SetData(data, getter);
         }
 
         private void WithdrawBtn_Click(object sender, RoutedEventArgs e)
@@ -190,6 +198,7 @@ namespace BankClientControl
             if (idx >= 0)
             {
                 AccountDetailsViewModel details = acctList[idx];
+                TxDataGetter getter = new TxDataGetter();
                 Transaction tx = new Transaction();
                 tx.acctLastName = details.AccountName;
                 tx.acctId = Convert.ToInt32(details.AccountId);
@@ -198,7 +207,7 @@ namespace BankClientControl
                 tx.txAmount = (float)Convert.ToDouble(depositTextBox.Text);
                 tx.txOperation = "withdraw";
 
-                BankClient.TcpClient().SetData(tx);
+                BankClient.TcpClient().SetData(tx, getter);
             }
         }
 
@@ -208,6 +217,7 @@ namespace BankClientControl
             if (idx >= 0)
             {
                 AccountDetailsViewModel details = acctList[idx];
+                TxDataGetter getter = new TxDataGetter();
                 Transaction tx = new Transaction();
                 tx.acctLastName = details.AccountName;
                 tx.acctId = Convert.ToInt32(details.AccountId);
@@ -216,7 +226,7 @@ namespace BankClientControl
                 tx.txAmount = (float)Convert.ToDouble(depositTextBox.Text);
                 tx.txOperation = "deposit";
 
-                BankClient.TcpClient().SetData(tx);
+                BankClient.TcpClient().SetData(tx, getter);
             }
         }
     }

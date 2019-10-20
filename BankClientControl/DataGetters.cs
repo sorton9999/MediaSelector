@@ -10,52 +10,81 @@ namespace BankClientControl
 {
     public class OpenAcctDataGetter : IDataGetter
     {
-        private string firstName = String.Empty;
-        private string lastName = String.Empty;
-        private float deposit = 0;
+        //private string firstName = String.Empty;
+        //private string lastName = String.Empty;
+        //private float deposit = 0;
+        OpenAcctData acctData = new OpenAcctData();
         const int MsgType = MessageTypes.OpenAcctMsgType;
 
-        public OpenAcctDataGetter(string first, string last, string dep)
+        public OpenAcctDataGetter()
         {
-            firstName = first;
-            lastName = last;
-            deposit = (float)Convert.ToDouble(dep);
+
+        }
+
+        public OpenAcctDataGetter(string first, string last, float dep, AccountType type)
+        {
+            acctData.firstName = first;
+            acctData.lastName = last;
+            acctData.deposit = dep;
+            acctData.acctType = type;
         }
 
         public MessageData GetData()
         {
             MessageData data = new MessageData();
-            Transaction tx = new Transaction();
-            tx.acctFirstName = firstName;
-            tx.acctLastName = lastName;
-            tx.txOperation = "open";
-            tx.txAmount = deposit;
-            data.id = 0;
-            data.name = "openacct";
-            data.message = tx;
-            data.id = MsgType;
+            if (acctData != null)
+            {
+                Transaction tx = new Transaction();
+                tx.acctFirstName = acctData.firstName;
+                tx.acctLastName = acctData.lastName;
+                tx.txOperation = "open";
+                tx.txAmount = acctData.deposit;
+                tx.acctType = acctData.acctType;
+                data.name = "openacct";
+                data.message = tx;
+                data.id = MsgType;
+            }
+            // Prevent data ringing
+            acctData = null;
             return data;
         }
 
         public MessageData GetData(long handle)
         {
             MessageData data = new MessageData();
-            Transaction tx = new Transaction();
-            tx.acctFirstName = firstName;
-            tx.acctLastName = lastName;
-            tx.txOperation = "open";
-            tx.txAmount = deposit;
-            data.id = 0;
-            data.name = "openacct";
-            data.message = tx;
-            data.id = MsgType;
-            data.handle = handle;
+            if (acctData != null)
+            {
+                Transaction tx = new Transaction();
+                tx.acctFirstName = acctData.firstName;
+                tx.acctLastName = acctData.lastName;
+                tx.txOperation = "open";
+                tx.txAmount = acctData.deposit;
+                tx.acctType = acctData.acctType;
+                data.name = "openacct";
+                data.message = tx;
+                data.id = MsgType;
+                data.handle = handle;
+            }
+            // Prevent data ringing
+            acctData = null;
             return data;
         }
 
         public void SetData(object data)
         {
+            OpenAcctData tempData = data as OpenAcctData;
+            if (tempData != null)
+            {
+                acctData = tempData;
+            }
+        }
 
+        public sealed class OpenAcctData
+        {
+            public string firstName = String.Empty;
+            public string lastName = String.Empty;
+            public float deposit = 0;
+            public AccountType acctType = AccountType.OTHER;
         }
     }
 
