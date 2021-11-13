@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using CommonClasses;
 
 namespace MethodSelectorConsole
 {
@@ -24,6 +25,7 @@ namespace MethodSelectorConsole
 
             string entry = String.Empty;
             string name = String.Empty;
+            string acctId = Bank.InitialID;
             float amt = 0F;
             float balance = 0F;
             AccountType acctType = AccountType.UNINIT;
@@ -56,6 +58,7 @@ namespace MethodSelectorConsole
                             Console.Write("Initial Deposit? ");
                             entry = Console.ReadLine();
                             amt = (float)Convert.ToDouble(entry);
+                            acctId = bank.GetNewAcctId();
                             string cmd = "uninit";
                             if (type == "s")
                             {
@@ -78,7 +81,7 @@ namespace MethodSelectorConsole
                             }
                             try
                             {
-                                balance = bank.PerformAction(name, cmd, amt, acctType, true);
+                                balance = bank.PerformAction(acctId, name, cmd, amt, acctType, true);
                             }
                             catch (Exception e)
                             {
@@ -92,7 +95,7 @@ namespace MethodSelectorConsole
                             amt = (float)Convert.ToDouble(entry);
                             try
                             {
-                                balance = bank.PerformAction(name, "deposit", amt);
+                                balance = bank.PerformAction(acctId, name, "deposit", amt);
                             }
                             catch (Exception e)
                             {
@@ -106,7 +109,7 @@ namespace MethodSelectorConsole
                             amt = (float)Convert.ToDouble(entry);
                             try
                             {
-                                balance = bank.PerformAction(name, "withdraw", amt);
+                                balance = bank.PerformAction(acctId, name, "withdraw", amt);
                             }
                             catch (Exception e)
                             {
@@ -117,7 +120,7 @@ namespace MethodSelectorConsole
                         case "b":
                             try
                             {
-                                Console.WriteLine("Balance is: " + bank.PerformAction(name, "balance", amt));
+                                Console.WriteLine("Balance is: " + bank.PerformAction(acctId, name, "balance", amt));
                             }
                             catch (Exception e)
                             {
@@ -126,7 +129,7 @@ namespace MethodSelectorConsole
                             break;
                         case "accrue":
                         case "a":
-                            AccountDetailsViewModel details = bank.GetDetailsByName(name);
+                            AccountDetailsViewModel details = bank.AccountDetailsByAccountId(acctId);
                             float defaultInterest = ((details.Type == AccountType.INTEREST_CHECKING) ? bank.CheckingInterest : bank.SavingsInterest);
                             Console.WriteLine("Accruing interest on Account: Default is {0}%", (defaultInterest * 100.0F));
                             Console.WriteLine("Do you want to change it? [y] or [n]");
@@ -141,7 +144,7 @@ namespace MethodSelectorConsole
                             }
                             try
                             {
-                                balance = bank.PerformAction(name, "accrue", interest);
+                                balance = bank.PerformAction(acctId, name, "accrue", interest);
                             }
                             catch (Exception e)
                             {
@@ -155,16 +158,40 @@ namespace MethodSelectorConsole
                             amt = 0;
                             try
                             {
-                                balance = bank.PerformAction(name, "balance", 0);
+                                AccountDetailsViewModel[] vm = bank.GetDetailsByName(name);
+                                string choice = String.Empty;
+                                if (vm.Count() > 1)
+                                {
+                                    Console.Write("Which Acct? ");
+                                    foreach (var v in vm.Select((x, i) => new { x, i }))
+                                    {
+                                        Console.Write("[{0}]: {1} - {2} ; ", v.i, v.x.AccountId, v.x.Type.ToString());
+                                    }
+                                    Console.Write(Environment.NewLine + "Choose One: ==> ");
+                                    choice = Console.ReadLine();
+                                }
+                                int chosenIdx = 0;
+                                if (!String.IsNullOrEmpty(choice))
+                                {
+                                    chosenIdx = Convert.ToInt32(choice);
+                                }
+                                string id = "0";
+                                if (vm != null)
+                                {
+                                    id = vm[chosenIdx].AccountId;
+                                }
+                                acctId = id;
+                                balance = bank.PerformAction(acctId, name, "balance", 0);
                             }
                             catch (Exception e)
                             {
+                                balance = 0;
                                 Console.WriteLine(e.Message);
                             }
                             break;
                         case "print":
                         case "p":
-                            Console.WriteLine(bank.PerformAction(name, "print", amt));
+                            Console.WriteLine(bank.PerformAction(acctId, name, "print", amt));
                             break;
                         case "dump":
                         case "du":

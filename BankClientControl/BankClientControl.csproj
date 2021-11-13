@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net5.0-windows</TargetFramework>
+    <OutputType>Library</OutputType>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="CliServLib">
+      <HintPath>..\MethodSelectorConsole\bin\Debug\CliServLib.dll</HintPath>
+    </Reference>
+    <Reference Include="CommonClasses">
+      <HintPath>..\CommonClasses\bin\Debug\CommonClasses.dll</HintPath>
+    </Reference>
+    <Reference Include="TcpLib">
+      <HintPath>..\MethodSelectorConsole\bin\Debug\TcpLib.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
+    <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
+  </ItemGroup>
+</Project>

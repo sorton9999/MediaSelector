@@ -1,32 +1,30 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net5.0-windows</TargetFramework>
-    <OutputType>Exe</OutputType>
+    <OutputType>WinExe</OutputType>
+    <RootNamespace>BankClient</RootNamespace>
+    <AssemblyName>BankClient</AssemblyName>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-    <UseWindowsForms>true</UseWindowsForms>
     <UseWPF>true</UseWPF>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="BankClientControl">
+      <HintPath>..\BankClientControl\bin\Debug\BankClientControl.dll</HintPath>
+    </Reference>
     <Reference Include="CliServLib, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>bin\Debug\CliServLib.dll</HintPath>
-    </Reference>
-    <Reference Include="CommonClasses">
-      <HintPath>..\CommonClasses\bin\Debug\CommonClasses.dll</HintPath>
-    </Reference>
-    <Reference Include="MethodSelector">
-      <HintPath>..\MethodSelector\bin\Debug\MethodSelector.dll</HintPath>
     </Reference>
     <Reference Include="TcpLib, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>bin\Debug\TcpLib.dll</HintPath>
     </Reference>
-    <Reference Include="UIAutomationProvider" />
-    <Reference Include="WindowsFormsIntegration" />
+  </ItemGroup>
+  <ItemGroup>
+    <AppDesigner Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
-    <PackageReference Include="Microsoft.Windows.Compatibility" Version="5.0.0" />
     <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
   </ItemGroup>
 </Project>

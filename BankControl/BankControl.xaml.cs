@@ -13,9 +13,8 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using CommonClasses;
 
-namespace MethodSelectorConsole
+namespace BankControl
 {
     /// <summary>
     /// Interaction logic for BankControl.xaml
@@ -24,21 +23,20 @@ namespace MethodSelectorConsole
     {
         private AccountNameViewModel vm = new AccountNameViewModel();
 
-        private static TransactionServer _server;
+       // private static TransactionServer _server;
 
         public BankControl()
         {
             InitializeComponent();
             acctTextBox.DataContext = Vm;
             errorTextBox.DataContext = Vm;
-            acctTypeComboBox.ItemsSource = CommonClasses.AccountDetailsClass.LoadAccountTypes(); //Account.LoadAccountTypes();
+            acctTypeComboBox.ItemsSource = Account.LoadAccountTypes();
 
-            _server = new TransactionServer(BankControlForm.Bank, this.Dispatcher);
+            _server = new TransactionServer(BankControlForm.Bank);
         }
 
         private void OpenButton_Click(object sender, RoutedEventArgs e)
         {
-            string acctId = BankControlForm.Bank.GetNewAcctId();
             Vm.ErrorString = String.Empty;
             try
             {
@@ -48,15 +46,15 @@ namespace MethodSelectorConsole
                 float amt = (float)Convert.ToDouble(entryTextBox.Text);
                 if (type == AccountType.SIMPLE_CHECKING)
                 {
-                    Bank.PerformAction(acctId, name, "deposit", amt, type, true);
+                    BankControlForm.Bank.PerformAction(name, "deposit", amt, type, true);
                 }
                 else if (type == AccountType.INTEREST_CHECKING)
                 {
-                    Bank.PerformAction(acctId, name, "accrue", amt, type, true);
+                    BankControlForm.Bank.PerformAction(name, "accrue", amt, type, true);
                 }
                 else if (type == AccountType.SAVINGS)
                 {
-                    Bank.PerformAction(acctId, name, "accrue", amt, type, true);
+                    BankControlForm.Bank.PerformAction(name, "accrue", amt, type, true);
                 }
                 else
                 {
@@ -83,23 +81,14 @@ namespace MethodSelectorConsole
             }
         }
 
-        public Bank Bank
-        {
-            get { return BankControlForm.Bank; }
-        }
-
         private void DepositButton_Click(object sender, RoutedEventArgs e)
         {
             Vm.ErrorString = String.Empty;
             try
             {
                 string name = acctTextBox.Text;
-                string id = "0";
                 float amt = (float)Convert.ToDouble(entryTextBox.Text);
-                int idx = acctListView.SelectedIndex;
-                AccountDetailsViewModel details = Bank.GetDetailsByIndex(idx);
-                id = details.AccountId;
-                Bank.PerformAction(id, name, "deposit", amt);
+                BankControlForm.Bank.PerformAction(name, "deposit", amt);
             }
             catch (Exception ex)
             {
@@ -114,12 +103,8 @@ namespace MethodSelectorConsole
             try
             {
                 string name = acctTextBox.Text;
-                string id = "0";
                 float amt = (float)Convert.ToDouble(entryTextBox.Text);
-                int idx = acctListView.SelectedIndex;
-                AccountDetailsViewModel details = Bank.GetDetailsByIndex(idx);
-                id = details.AccountId;
-                Bank.PerformAction(id, name, "withdraw", amt);
+                BankControlForm.Bank.PerformAction(name, "withdraw", amt);
             }
             catch (Exception ex)
             {
@@ -131,7 +116,7 @@ namespace MethodSelectorConsole
         private void AcctListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             int idx = (sender as ListView).SelectedIndex;
-            AccountDetailsViewModel details = Bank.GetDetailsByIndex(idx);
+            AccountDetailsViewModel details = BankControlForm.Bank.GetDetailsByIndex(idx);
             if (details != null)
             {
                 Vm.ActiveAccountName = details.AccountName;
@@ -141,47 +126,24 @@ namespace MethodSelectorConsole
 
         private void InterestButton_Click(object sender, RoutedEventArgs e)
         {
-            //AcctListView_SelectionChanged(acctListView, null);
-            int idx = acctListView.SelectedIndex;
-            try
+            AcctListView_SelectionChanged(acctListView, null);
+            AccountDetailsViewModel vm = BankControlForm.Bank.GetDetailsByName(Vm.ActiveAccountName);
+            if (vm != null)
             {
-                AccountDetailsViewModel vm = BankControlForm.Bank.GetDetailsByIndex(idx);
-                if (vm != null)
-                {
-                    float interest = (vm.Type == AccountType.INTEREST_CHECKING ? Bank.CheckingInterest : Bank.SavingsInterest);
-                    Bank.PerformAction(vm.AccountId, Vm.ActiveAccountName, "accrue", interest);
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-                Vm.ErrorString = ex.Message;
+                float interest = (vm.Type == AccountType.INTEREST_CHECKING ? BankControlForm.Bank.CheckingInterest : BankControlForm.Bank.SavingsInterest);
+                BankControlForm.Bank.PerformAction(Vm.ActiveAccountName, "accrue", interest);
             }
         }
 
         private void DetailsButton_Click(object sender, RoutedEventArgs e)
         {
             string name = acctTextBox.Text;
-            int idx = acctListView.SelectedIndex;
-            try
+            AccountDetailsViewModel vm = BankControlForm.Bank.GetDetailsByName(name);
+            if (vm != null)
             {
-                AccountDetailsViewModel vm = Bank.GetDetailsByIndex(idx);
-                if (vm != null)
-                {
-                    acctDetailsGrid.DataContext = vm;
-                    acctDetailsPanel.Visibility = Visibility.Visible;
-                }
+                acctDetailsGrid.DataContext = vm;
+                acctDetailsPanel.Visibility = Visibility.Visible;
             }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-                Vm.ErrorString = ex.Message;
-            }
-        }
-
-        public void CloseWindow()
-        {
-            _server.CleanUp();
         }
     }
 

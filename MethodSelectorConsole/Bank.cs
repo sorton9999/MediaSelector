@@ -6,6 +6,8 @@ using System.Text;
 using System.Threading.Tasks;
 
 using MethodSelector;
+using CommonClasses;
+using System.Windows.Threading;
 
 namespace MethodSelectorConsole
 {
@@ -13,9 +15,11 @@ namespace MethodSelectorConsole
     {
         private readonly Dictionary<string, Account> accounts = new Dictionary<string, Account>();
         private AccountDetailsListViewModel accountDetails = new AccountDetailsListViewModel();
-        private string newId = "12345";
         private float checkingInterest = 0.05F;
         private float savingsInterest = 0.03F;
+
+        public const string InitialID = "12345";
+        public string latestAcctId = InitialID;
 
         #region Constructor
 
@@ -55,26 +59,30 @@ namespace MethodSelectorConsole
             private set { savingsInterest = value; }
         }
 
+        public Dispatcher Dispatcher
+        {
+            get;
+            set;
+        }
+
         #endregion
 
         #region Public Methods
 
-        public float PerformAction(string name, string action, float amount, AccountType acctType = AccountType.SIMPLE_CHECKING, bool openAcct = false)
+        public float PerformAction(string id, string name, string action, float amount, AccountType acctType = AccountType.SIMPLE_CHECKING, bool openAcct = false)
         {
             Account account = null;
             float balance = 0;
             try
             {
-                account = FindAccount(name);
+                account = FindAccount(id);
             }
             catch (MethodSelector.AccountNotFoundException e)
             {
                 Console.WriteLine(e.Message);
                 if (openAcct)
                 {
-                    long id = Convert.ToInt64(newId);
-                    newId = (++id).ToString();
-                    account = MakeAccount(name, newId, amount, acctType);
+                    account = MakeAccount(name, id, amount, acctType);
                 }
                 else
                 {
@@ -105,13 +113,18 @@ namespace MethodSelectorConsole
             return balance;
         }
 
-        public AccountDetailsViewModel GetDetailsByName(string name)
+        public AccountDetailsViewModel[] GetDetailsByName(string name)
         {
-            AccountDetailsViewModel ret = null;
+            AccountDetailsViewModel[] ret = null;
             var item = accountDetails.AccountDetailsList.ToLookup(x => x.AccountName == name);
-            foreach (var p in item[true])
+            var t = item[true];
+            if (t.Count() > 0)
             {
-                ret = p;
+                ret = new AccountDetailsViewModel[t.Count()];
+                foreach (var p in t.Select((x, i) => new { x,i }))
+                {
+                    ret[p.i] = p.x;
+                }
             }
             return ret;
         }
@@ -136,7 +149,7 @@ namespace MethodSelectorConsole
             }
             catch (Exception e)
             {
-                System.Diagnostics.Debug.WriteLine(e.Message);
+                throw new BankingException("Details not found at IDX: " + idx);
             }
             return details;
         }
@@ -147,6 +160,17 @@ namespace MethodSelectorConsole
             {
                 acct.Value.Value.PrintAccountDetails(acct.Index);
             }
+        }
+
+        public string GetNewAcctId()
+        {
+            string newId = latestAcctId;
+
+            long id = Convert.ToInt64(newId);
+            newId = (++id).ToString();
+            latestAcctId = newId;
+
+            return newId;
         }
 
         #endregion
@@ -177,7 +201,7 @@ namespace MethodSelectorConsole
 
         private void UpdateDetails(Account account, float balance)
         {
-            var item = accountDetails.AccountDetailsList.ToLookup(x => x.AccountName == account.AccountName);
+            var item = accountDetails.AccountDetailsList.ToLookup(x => x.AccountId == account.AccountDetails.AccountId);
             foreach (var p in item[true])
             {
                 p.Balance = balance;
@@ -204,7 +228,6 @@ namespace MethodSelectorConsole
                     throw new BankingException("Account of type OTHER not supported.");
                 default:
                     throw new IllegalOperationException("Unsupported account type detected.  Nothing done.");
-                    break;
             }
 
             //if (extended)
@@ -219,8 +242,16 @@ namespace MethodSelectorConsole
             {
                 try
                 {
-                    accounts.Add(name, account);
-                    accountDetails.AccountDetailsList.Add(account.AccountDetails);
+                    accounts.Add(id, account);
+
+                    if (!Dispatcher.CheckAccess())
+                    {
+                        Dispatcher.Invoke(AccountDetailsListViewModel.addAction, account.AccountDetails);
+                    }
+                    else
+                    {
+                        AccountDetailsListViewModel.addAction.Invoke(account.AccountDetails);
+                    }
                 }
                 catch (Exception e)
                 {
@@ -236,12 +267,12 @@ namespace MethodSelectorConsole
         //    return (PerformAction(name, action, amt, true, openAcct));
         //}
 
-        private Account FindAccount(string name)
+        private Account FindAccount(string id)
         {
             Account account = null;
             try
             {
-                var acct = accounts.ToLookup(x => x.Key == name);
+                var acct = accounts.ToLookup(x => x.Key == id);
                 foreach (var p in acct[true])
                 {
                     account = p.Value;
@@ -250,11 +281,11 @@ namespace MethodSelectorConsole
             catch (Exception e)
             {
                 System.Diagnostics.Debug.WriteLine("FindAccount: " + e.Message);
-                throw new AccountNotFoundException("Account Not Found: [" + name + "]");
+                throw new AccountNotFoundException("Account Not Found: [" + id + "]");
             }
             if (account == null)
             {
-                throw new AccountNotFoundException("Account Not Found: [" + name + "]");
+                throw new AccountNotFoundException("Account Not Found: [" + id + "]");
             }
             return account;
         }
