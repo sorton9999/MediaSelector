@@ -228,7 +228,6 @@ namespace MethodSelectorConsole
                     throw new BankingException("Account of type OTHER not supported.");
                 default:
                     throw new IllegalOperationException("Unsupported account type detected.  Nothing done.");
-                    break;
             }
 
             //if (extended)
