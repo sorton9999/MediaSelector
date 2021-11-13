@@ -69,6 +69,16 @@ namespace MethodSelectorConsole
 
         #region Public Methods
 
+        /// <summary>
+        /// The main banking actions done here.
+        /// </summary>
+        /// <param name="id">The account ID</param>
+        /// <param name="name">The name associated with the account</param>
+        /// <param name="action">The banking action to perform</param>
+        /// <param name="amount">The dollar amount associated with the banking action</param>
+        /// <param name="acctType">The account type, interest bearing or not</param>
+        /// <param name="openAcct">Are we opening a new account?</param>
+        /// <returns></returns>
         public float PerformAction(string id, string name, string action, float amount, AccountType acctType = AccountType.SIMPLE_CHECKING, bool openAcct = false)
         {
             Account account = null;
